@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/models/player.dart';
 
 class PlayerProfileScreen extends StatelessWidget {
@@ -9,89 +10,224 @@ class PlayerProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${player.name} Profile'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.indigo.shade100,
-                    child: const Icon(Icons.person, size: 60, color: Colors.indigo),
+        child: Column(
+          children: [
+            // Profile header
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 20, right: 20, bottom: 28,
+              ),
+              decoration: const BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(player.name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.shade100,
-                    borderRadius: BorderRadius.circular(20),
+                  const SizedBox(height: 20),
+                  // Avatar
+                  Container(
+                    width: 80, height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      player.name.isNotEmpty ? player.name[0].toUpperCase() : '?',
+                      style: const TextStyle(color: Colors.white, fontSize: 36,
+                          fontWeight: FontWeight.w900),
+                    ),
                   ),
-                  child: Text(
-                    'MVP Points: ${player.mvpPoints}', 
-                    textAlign: TextAlign.center, 
-                    style: TextStyle(fontSize: 16, color: Colors.orange.shade900, fontWeight: FontWeight.bold)
+                  const SizedBox(height: 12),
+                  Text(player.name,
+                      style: const TextStyle(color: Colors.white, fontSize: 24,
+                          fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.accentGradient,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.accent.withOpacity(0.3),
+                          blurRadius: 8, offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded, color: Colors.white, size: 18),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${player.mvpPoints} MVP Points',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800,
+                              fontSize: 15),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                _buildSectionHeader('Batting Statistics', Icons.sports_cricket),
-                _buildStatRow('Runs Scored', '${player.runsScored}'),
-                _buildStatRow('Balls Faced', '${player.ballsFaced}'),
-                _buildStatRow('Strike Rate', player.strikeRate.toStringAsFixed(2)),
-                _buildStatRow('Boundary 4s', '${player.fours}'),
-                _buildStatRow('Boundary 6s', '${player.sixes}'),
-                const Divider(height: 40, thickness: 1),
-                _buildSectionHeader('Bowling & Fielding', Icons.sports_baseball),
-                _buildStatRow('Wickets Taken', '${player.wicketsTaken}'),
-                _buildStatRow('Overs Bowled', '${player.oversBowled}'),
-                _buildStatRow('Runs Conceded', '${player.runsConceded}'),
-                _buildStatRow('Economy Rate', player.economy.toStringAsFixed(2)),
-                _buildStatRow('Catches', '${player.catches}'),
-              ],
+                ],
+              ),
             ),
-          ),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Quick stats row
+                  Row(
+                    children: [
+                      Expanded(child: _quickStat('${player.runsScored}', 'Runs',
+                          AppTheme.primaryLight, Icons.sports_cricket_rounded)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _quickStat('${player.wicketsTaken}', 'Wickets',
+                          AppTheme.red, Icons.sports_baseball_rounded)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _quickStat('${player.catches}', 'Catches',
+                          AppTheme.accent, Icons.pan_tool_rounded)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Batting stats
+                  _buildStatSection(
+                    title: 'Batting',
+                    icon: Icons.sports_cricket_rounded,
+                    iconColor: AppTheme.primaryLight,
+                    stats: [
+                      ('Runs Scored', '${player.runsScored}'),
+                      ('Balls Faced', '${player.ballsFaced}'),
+                      ('Strike Rate', player.strikeRate.toStringAsFixed(2)),
+                      ('Boundaries (4s)', '${player.fours}'),
+                      ('Sixes (6s)', '${player.sixes}'),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Bowling & Fielding stats
+                  _buildStatSection(
+                    title: 'Bowling & Fielding',
+                    icon: Icons.sports_baseball_rounded,
+                    iconColor: AppTheme.blue,
+                    stats: [
+                      ('Wickets Taken', '${player.wicketsTaken}'),
+                      ('Overs Bowled', '${player.oversBowled}'),
+                      ('Runs Conceded', '${player.runsConceded}'),
+                      ('Economy Rate', player.economy.toStringAsFixed(2)),
+                      ('Catches', '${player.catches}'),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
+  Widget _quickStat(String value, String label, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
         children: [
-          Icon(icon, color: Colors.indigo),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.indigo),
-          ),
+          Icon(icon, size: 18, color: color),
+          const SizedBox(height: 6),
+          Text(value,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
+          Text(label,
+              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 
-  Widget _buildStatRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildStatSection({
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required List<(String, String)> stats,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
         children: [
-          Text(label, style: const TextStyle(fontSize: 16, color: Colors.black87)),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          // section header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 16),
+                ),
+                const SizedBox(width: 10),
+                Text(title,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary)),
+              ],
+            ),
+          ),
+          const Divider(color: AppTheme.border, height: 1),
+          // stat rows
+          ...stats.asMap().entries.map((entry) {
+            final isLast = entry.key == stats.length - 1;
+            final stat = entry.value;
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(stat.$1,
+                          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                      Text(stat.$2,
+                          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+                if (!isLast) const Divider(color: AppTheme.border, height: 1, indent: 16),
+              ],
+            );
+          }),
         ],
       ),
     );

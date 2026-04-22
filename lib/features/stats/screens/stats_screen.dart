@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../app_controller.dart';
 import '../../../core/models/player.dart';
 import '../../../core/models/team.dart';
@@ -8,35 +9,96 @@ import 'player_profile_screen.dart';
 class StatsScreen extends StatelessWidget {
   final AppController controller = Get.find<AppController>();
 
+  StatsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Real Leaderboards'),
-          backgroundColor: Colors.indigo,
-          foregroundColor: Colors.white,
-          bottom: const TabBar(
-            isScrollable: true,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: [
-              Tab(text: 'Player Ranking'),
-              Tab(text: 'Batting Ranking'),
-              Tab(text: 'Bowling Ranking'),
-              Tab(text: 'All-Rounder Ranking'),
-              Tab(text: 'Team Ranking'),
-            ],
-          ),
-        ),
-        body: TabBarView(
+        body: Column(
           children: [
-            _buildMVPList(),
-            _buildBatsmenList(),
-            _buildBowlersList(),
-            _buildAllRounderList(),
-            _buildTeamsList(),
+            // Header
+            Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 16,
+                right: 16,
+                bottom: 0,
+              ),
+              decoration: const BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(0)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Leaderboards',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            'Global rankings & stats',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const TabBar(
+                    isScrollable: true,
+                    tabs: [
+                      Tab(text: '⭐  MVP'),
+                      Tab(text: '🏏  Batting'),
+                      Tab(text: '⚾  Bowling'),
+                      Tab(text: '🎭  All-Round'),
+                      Tab(text: '🏆  Teams'),
+                    ],
+                    tabAlignment: TabAlignment.start,
+                  ),
+                ],
+              ),
+            ),
+            // Tab content
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildMVPList(),
+                  _buildBatsmenList(),
+                  _buildBowlersList(),
+                  _buildAllRounderList(),
+                  _buildTeamsList(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -44,103 +106,567 @@ class StatsScreen extends StatelessWidget {
   }
 
   List<Player> _getActivePlayers() {
-    // Only show "real" players by filtering out dummy bench-warmers who never batted or bowled!
-    return controller.getAllPlayers().where((p) => p.ballsFaced > 0 || p.oversBowled > 0 || p.wicketsTaken > 0 || p.runsScored > 0).toList();
+    return controller
+        .getAllPlayers()
+        .where(
+          (p) =>
+              p.ballsFaced > 0 ||
+              p.oversBowled > 0 ||
+              p.wicketsTaken > 0 ||
+              p.runsScored > 0,
+        )
+        .toList();
+  }
+
+  Widget _buildTableHeader(String type) {
+    String col3 = 'Score';
+    String col4 = 'Strike rate';
+    String col5 = 'Average';
+
+    if (type == 'MVP' || type == 'All-Round') {
+      col3 = 'Points';
+      col4 = 'Runs';
+      col5 = 'Wickets';
+    } else if (type == 'Batting') {
+      col3 = 'Runs';
+      col4 = 'Strike rate';
+      col5 = 'Average';
+    } else if (type == 'Bowling') {
+      col3 = 'Wickets';
+      col4 = 'Econ';
+      col5 = 'Average';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: const BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        border: Border(bottom: BorderSide(color: AppTheme.border)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: Text(
+              'No',
+              style: TextStyle(
+                color: AppTheme.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Name',
+              style: TextStyle(
+                color: AppTheme.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                'Matches',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                col3,
+                style: const TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                col4,
+                style: const TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                col5,
+                style: const TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerTableRow(Player p, int index, String type) {
+    String score = '';
+    String sr = '';
+    String avg = '';
+
+    if (type == 'MVP' || type == 'All-Round') {
+      score = p.mvpPoints.toString();
+      sr = p.runsScored.toString();
+      avg = p.wicketsTaken.toString();
+    } else if (type == 'Batting') {
+      score = p.runsScored.toString();
+      sr = p.strikeRate.toStringAsFixed(1);
+      avg = p.battingAverage.toStringAsFixed(1);
+    } else if (type == 'Bowling') {
+      score = p.wicketsTaken.toString();
+      sr = p.economy.toStringAsFixed(2);
+      avg = p.bowlingAverage.toStringAsFixed(1);
+    }
+
+    return GestureDetector(
+      onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppTheme.border)),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 24,
+              child: Text(
+                '${index + 1}',
+                style: const TextStyle(
+                  color: AppTheme.textMuted,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                p.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: AppTheme.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(
+              width: 45,
+              child: Center(
+                child: Text(
+                  '${p.matchesPlayed}',
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 45,
+              child: Center(
+                child: Text(
+                  score,
+                  style: const TextStyle(
+                    color: AppTheme.primaryLight,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 45,
+              child: Center(
+                child: Text(
+                  sr,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 45,
+              child: Center(
+                child: Text(
+                  avg,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildMVPList() {
     var players = _getActivePlayers();
     players.sort((a, b) => b.mvpPoints.compareTo(a.mvpPoints));
-    return ListView.builder(
-      itemCount: players.length,
-      itemBuilder: (context, index) {
-        Player p = players[index];
-        return ListTile(
-          onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
-          leading: CircleAvatar(backgroundColor: index == 0 ? Colors.amber : Colors.grey.shade300, child: Text('${index + 1}')),
-          title: Text(p.name),
-          subtitle: Text('${p.runsScored}R | ${p.wicketsTaken}W | ${p.catches}C'),
-          trailing: Text('${p.mvpPoints} pts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amber)),
-        );
-      },
+    if (players.isEmpty) return _emptyState('No player data yet');
+    return Column(
+      children: [
+        _buildTableHeader('MVP'),
+        Expanded(
+          child: ListView.builder(
+            itemCount: players.length,
+            itemBuilder: (context, index) {
+              return _buildPlayerTableRow(players[index], index, 'MVP');
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildBatsmenList() {
     var players = _getActivePlayers();
     players.sort((a, b) => b.runsScored.compareTo(a.runsScored));
-    return ListView.builder(
-      itemCount: players.length,
-      itemBuilder: (context, index) {
-        Player p = players[index];
-        return ListTile(
-          onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
-          leading: CircleAvatar(backgroundColor: index == 0 ? Colors.orange : Colors.grey.shade300, child: Text('${index + 1}')),
-          title: Text(p.name),
-          subtitle: Text('SR: ${p.strikeRate.toStringAsFixed(1)}'),
-          trailing: Text('${p.runsScored} Runs', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        );
-      },
+    if (players.isEmpty) return _emptyState('No batting data yet');
+    return Column(
+      children: [
+        _buildTableHeader('Batting'),
+        Expanded(
+          child: ListView.builder(
+            itemCount: players.length,
+            itemBuilder: (context, index) {
+              return _buildPlayerTableRow(players[index], index, 'Batting');
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildBowlersList() {
     var players = _getActivePlayers();
     players.sort((a, b) => b.wicketsTaken.compareTo(a.wicketsTaken));
-    return ListView.builder(
-      itemCount: players.length,
-      itemBuilder: (context, index) {
-        Player p = players[index];
-        return ListTile(
-          onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
-          leading: CircleAvatar(backgroundColor: index == 0 ? Colors.purple : Colors.grey.shade300, child: Text('${index + 1}')),
-          title: Text(p.name),
-          subtitle: Text('Econ: ${p.economy.toStringAsFixed(2)}'),
-          trailing: Text('${p.wicketsTaken} Wkts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        );
-      },
+    if (players.isEmpty) return _emptyState('No bowling data yet');
+    return Column(
+      children: [
+        _buildTableHeader('Bowling'),
+        Expanded(
+          child: ListView.builder(
+            itemCount: players.length,
+            itemBuilder: (context, index) {
+              return _buildPlayerTableRow(players[index], index, 'Bowling');
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildAllRounderList() {
-    // Only fetch players who have BOTH Batted (runs > 0/faced balls) and Bowled (wickets > 0/bowled overs)
-    var players = _getActivePlayers().where((p) => p.runsScored > 0 && p.wicketsTaken > 0).toList();
+    var players = _getActivePlayers()
+        .where((p) => p.runsScored > 0 && p.wicketsTaken > 0)
+        .toList();
     players.sort((a, b) => b.mvpPoints.compareTo(a.mvpPoints));
-    return ListView.builder(
-      itemCount: players.length,
-      itemBuilder: (context, index) {
-        Player p = players[index];
-        return ListTile(
-          onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
-          leading: CircleAvatar(backgroundColor: index == 0 ? Colors.teal : Colors.grey.shade300, child: Text('${index + 1}')),
-          title: Text(p.name),
-          subtitle: Text('${p.runsScored} Runs | ${p.wicketsTaken} Wickets'),
-          trailing: Text('${p.mvpPoints} pts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        );
-      },
+    if (players.isEmpty) return _emptyState('No all-rounder data yet');
+    return Column(
+      children: [
+        _buildTableHeader('All-Round'),
+        Expanded(
+          child: ListView.builder(
+            itemCount: players.length,
+            itemBuilder: (context, index) {
+              return _buildPlayerTableRow(players[index], index, 'All-Round');
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeamTableHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: const BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        border: Border(bottom: BorderSide(color: AppTheme.border)),
+      ),
+      child: const Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: Text(
+              'No',
+              style: TextStyle(
+                color: AppTheme.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Team',
+              style: TextStyle(
+                color: AppTheme.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                'M',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                'W',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                'L',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 36,
+            child: Center(
+              child: Text(
+                'PTS',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                'NRR',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTeamTableRow(Team t, int index) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.border)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: Text(
+              '${index + 1}',
+              style: const TextStyle(
+                color: AppTheme.textMuted,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: AppTheme.primary.withOpacity(0.2),
+                  child: Text(
+                    t.name.isNotEmpty ? t.name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      color: AppTheme.primaryLight,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    t.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: AppTheme.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                '${t.matchesPlayed}',
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                '${t.wins}',
+                style: const TextStyle(
+                  color: AppTheme.primaryLight,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 32,
+            child: Center(
+              child: Text(
+                '${t.losses}',
+                style: const TextStyle(color: AppTheme.red, fontSize: 13),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 36,
+            child: Center(
+              child: Text(
+                '${t.points}',
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 45,
+            child: Center(
+              child: Text(
+                t.netRunRate.toStringAsFixed(2),
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildTeamsList() {
     var teams = controller.teams.toList();
     teams.sort((a, b) {
-      if (b.points == a.points) {
-        return b.netRunRate.compareTo(a.netRunRate);
-      }
+      if (b.points == a.points) return b.netRunRate.compareTo(a.netRunRate);
       return b.points.compareTo(a.points);
     });
+    if (teams.isEmpty) return _emptyState('No team data yet');
 
-    return ListView.builder(
-      itemCount: teams.length,
-      itemBuilder: (context, index) {
-        Team t = teams[index];
-        return ListTile(
-          leading: CircleAvatar(child: Text('${index + 1}')),
-          title: Text(t.name),
-          subtitle: Text('W: ${t.wins} | L: ${t.losses} | NRR: ${t.netRunRate.toStringAsFixed(2)}'),
-          trailing: Text('${t.points} Pts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        );
-      },
+    return Column(
+      children: [
+        _buildTeamTableHeader(),
+        Expanded(
+          child: ListView.builder(
+            itemCount: teams.length,
+            itemBuilder: (context, index) {
+              return _buildTeamTableRow(teams[index], index);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emptyState(String message) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.bar_chart_rounded,
+            size: 56,
+            color: AppTheme.textMuted,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+          ),
+        ],
+      ),
     );
   }
 }

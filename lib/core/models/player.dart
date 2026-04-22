@@ -10,6 +10,7 @@ class Player {
   int mvpPoints;
   int fours;
   int sixes;
+  int matchesPlayed;
 
   Player({
     required this.id,
@@ -23,11 +24,15 @@ class Player {
     this.mvpPoints = 0,
     this.fours = 0,
     this.sixes = 0,
+    this.matchesPlayed = 0,
   });
 
   double get strikeRate =>
       runsScored > 0 && ballsFaced > 0 ? (runsScored / ballsFaced) * 100 : 0.0;
   double get economy => oversBowled > 0 ? runsConceded / oversBowled : 0.0;
+  
+  double get battingAverage => matchesPlayed > 0 ? runsScored / matchesPlayed : 0.0;
+  double get bowlingAverage => wicketsTaken > 0 ? runsConceded / wicketsTaken : 0.0;
 
   void updateMVPPoints() {
     mvpPoints = runsScored + (wicketsTaken * 20) + (catches * 10);
@@ -45,6 +50,7 @@ class Player {
     'mvpPoints': mvpPoints,
     'fours': fours,
     'sixes': sixes,
+    'matchesPlayed': matchesPlayed,
   };
 
   factory Player.fromJson(Map<String, dynamic> json) => Player(
@@ -59,5 +65,6 @@ class Player {
     mvpPoints: json['mvpPoints'] ?? 0,
     fours: json['fours'] ?? 0,
     sixes: json['sixes'] ?? 0,
+    matchesPlayed: json['matchesPlayed'] ?? 0,
   );
 }

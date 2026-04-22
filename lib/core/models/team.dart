@@ -34,6 +34,11 @@ class Team {
     return runRateScored - runRateConceded;
   }
 
+  double get runRate {
+    // Force analyzer refresh
+    return totalOversFaced > 0 ? totalRunsScored / totalOversFaced : 0.0;
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,

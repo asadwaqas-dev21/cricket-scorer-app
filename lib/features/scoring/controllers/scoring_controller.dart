@@ -7,6 +7,7 @@ import '../../../core/models/ball_event.dart';
 import '../../../core/models/completed_match.dart';
 import '../../app_controller.dart';
 import '../../home/screens/home_screen.dart';
+import '../../../core/theme/app_theme.dart';
 
 class ScoringController extends GetxController {
   var matchSettings = Rxn<MatchSettings>();
@@ -77,6 +78,7 @@ class ScoringController extends GetxController {
     bowlTeamRef = batTeamRef == playingTeam1 ? playingTeam2 : playingTeam1;
 
     // We can show player selection UI instead of default
+    allEvents.clear();
     _startInnings(batTeamRef, bowlTeamRef);
     _saveBaseline([...team1.players, ...team2.players]);
   }
@@ -88,7 +90,6 @@ class ScoringController extends GetxController {
     nonStriker.value = batTeam.players[1];
     bowler.value = bowlTeam.players[0];
 
-    allEvents.clear();
     _rebuildFromEvents();
   }
 
@@ -191,6 +192,7 @@ class ScoringController extends GetxController {
         wicketType: wicketType,
         catcherId: catcherId,
         batsmanRuns: batsmanRuns,
+        innings: isFirstInnings.value ? 1 : 2,
       ),
     );
 
@@ -224,29 +226,53 @@ class ScoringController extends GetxController {
 
     Get.bottomSheet(
       Container(
-        color: Colors.white,
+        decoration: const BoxDecoration(
+          color: AppTheme.surfaceCard,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
         child: SafeArea(
           child: ListView(
             shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.textMuted,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   'Select Next ${role.capitalizeFirst}',
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
               ),
+              const Divider(color: AppTheme.border),
               ListTile(
-                leading: const Icon(Icons.person_add, color: Colors.indigo),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.person_add_rounded, color: AppTheme.primaryLight, size: 20),
+                ),
                 title: const Text(
                   'Add New Custom Player',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryLight,
                   ),
                 ),
                 onTap: () {
@@ -254,11 +280,27 @@ class ScoringController extends GetxController {
                   _addNewPlayerDialog(role, team);
                 },
               ),
-              const Divider(),
+              const Divider(color: AppTheme.border),
               ...team.players
                   .map(
                     (p) => ListTile(
-                      title: Text(p.name),
+                      leading: CircleAvatar(
+                        backgroundColor: AppTheme.surfaceElevated,
+                        child: Text(
+                          p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        p.name,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       onTap: () {
                         changePlayer(role, p);
                         Get.back();
@@ -294,7 +336,7 @@ class ScoringController extends GetxController {
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
+              backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
             ),
             onPressed: () {
@@ -362,13 +404,24 @@ class ScoringController extends GetxController {
   void _rebuildFromEvents() {
     _restoreBaseline();
 
-    currentOvers.value = 0;
-    currentBalls.value = 0;
-    totalRuns.value = 0;
-    wickets.value = 0;
-    historyRuns.clear();
+    int simOvers = 0;
+    int simBalls = 0;
+    int simRuns = 0;
+    int simWickets = 0;
+    List<String> simHistory = [];
+
+    int currentInnings = 1;
 
     for (var e in allEvents) {
+      if (e.innings != currentInnings) {
+         currentInnings = e.innings;
+         simOvers = 0;
+         simBalls = 0;
+         simRuns = 0;
+         simWickets = 0;
+         simHistory.clear();
+      }
+
       var mainCtrl = Get.find<AppController>();
       Player pStriker = mainCtrl.getAllPlayers().firstWhere(
         (p) => p.id == e.strikerId,
@@ -378,23 +431,23 @@ class ScoringController extends GetxController {
       );
 
       if (e.extraType == "") {
-        totalRuns.value += e.runs;
-        currentBalls.value++;
+        simRuns += e.runs;
+        simBalls++;
         pStriker.runsScored += e.runs;
         pStriker.ballsFaced += 1;
         if (e.runs == 4) pStriker.fours++;
         if (e.runs == 6) pStriker.sixes++;
-        historyRuns.add(e.isWicket ? 'W' : e.runs.toString());
+        simHistory.add(e.isWicket ? 'W' : e.runs.toString());
       } else {
-        totalRuns.value += e.runs;
+        simRuns += e.runs;
         if (e.extraType == 'NB') {
-          historyRuns.add('${e.runs}NB');
+          simHistory.add('${e.runs}NB');
           pStriker.runsScored += e.batsmanRuns;
           if (e.batsmanRuns == 4) pStriker.fours++;
           if (e.batsmanRuns == 6) pStriker.sixes++;
           pStriker.ballsFaced += 1;
         } else {
-          historyRuns.add(e.extraType);
+          simHistory.add(e.extraType);
           if (e.extraType != 'WD') {
             pStriker.runsScored += e.runs > 0 ? e.runs - 1 : 0;
             pStriker.ballsFaced += 1;
@@ -405,7 +458,7 @@ class ScoringController extends GetxController {
       pBowler.runsConceded += e.runs;
 
       if (e.isWicket) {
-        wickets.value++;
+        simWickets++;
         if (e.wicketType != 'Run Out') {
           pBowler.wicketsTaken++;
         }
@@ -420,16 +473,32 @@ class ScoringController extends GetxController {
         }
       }
 
-      if (currentBalls.value == 6) {
-        currentBalls.value = 0;
-        currentOvers.value++;
+      if (simBalls == 6) {
+        simBalls = 0;
+        simOvers++;
         pBowler.oversBowled++;
-        historyRuns.clear();
+        simHistory.clear();
       }
 
       pStriker.updateMVPPoints();
       pBowler.updateMVPPoints();
     }
+
+    if (!isFirstInnings.value && currentInnings == 1) {
+       simOvers = 0;
+       simBalls = 0;
+       simRuns = 0;
+       simWickets = 0;
+       simHistory.clear();
+    }
+
+    currentOvers.value = simOvers;
+    currentBalls.value = simBalls;
+    totalRuns.value = simRuns;
+    wickets.value = simWickets;
+    
+    historyRuns.clear();
+    historyRuns.addAll(simHistory);
 
     // Check if match was won
     int maxOvers = matchSettings.value!.totalOvers;
@@ -555,6 +624,8 @@ class ScoringController extends GetxController {
 
     List<Player> allMatchPlayers = [...team1Ref.players, ...team2Ref.players];
     for (var p in allMatchPlayers) {
+      p.matchesPlayed++;
+      
       int r = getPlayerMatchRuns(p);
       int b = getPlayerMatchBalls(p);
       int w = getPlayerMatchWickets(p);

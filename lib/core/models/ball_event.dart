@@ -9,6 +9,7 @@ class BallEvent {
   String wicketType;
   String? catcherId;
   int batsmanRuns;
+  int innings;
 
   BallEvent({
     required this.runs,
@@ -21,5 +22,6 @@ class BallEvent {
     this.wicketType = "",
     this.catcherId,
     this.batsmanRuns = 0,
+    this.innings = 1,
   });
 }
