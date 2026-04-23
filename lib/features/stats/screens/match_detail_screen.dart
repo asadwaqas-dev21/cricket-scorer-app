@@ -5,7 +5,7 @@ import '../../../core/models/completed_match.dart';
 class MatchDetailScreen extends StatelessWidget {
   final CompletedMatch match;
 
-  const MatchDetailScreen({Key? key, required this.match}) : super(key: key);
+  const MatchDetailScreen({super.key, required this.match});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class MatchDetailScreen extends StatelessWidget {
                 top: MediaQuery.of(context).padding.top + 8,
                 left: 16, right: 16, bottom: 20,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
               ),
@@ -31,17 +31,17 @@ class MatchDetailScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
+                          child: Icon(Icons.arrow_back_ios_new_rounded,
                               color: Colors.white, size: 16),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      const Column(
+                      SizedBox(width: 16),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Match Scorecard',
@@ -53,10 +53,10 @@ class MatchDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   // Score summary
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -68,22 +68,22 @@ class MatchDetailScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(match.team1Name,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 13,
+                                  style: TextStyle(color: Colors.white70, fontSize: 13,
                                       fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text(match.team1Score,
-                                  style: const TextStyle(color: Colors.white, fontSize: 26,
+                                  style: TextStyle(color: Colors.white, fontSize: 26,
                                       fontWeight: FontWeight.w900)),
                             ],
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Text('VS',
+                          child: Text('VS',
                               style: TextStyle(color: Colors.white, fontSize: 12,
                                   fontWeight: FontWeight.w900)),
                         ),
@@ -92,11 +92,11 @@ class MatchDetailScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(match.team2Name,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 13,
+                                  style: TextStyle(color: Colors.white70, fontSize: 13,
                                       fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text(match.team2Score,
-                                  style: const TextStyle(color: Colors.white, fontSize: 26,
+                                  style: TextStyle(color: Colors.white, fontSize: 26,
                                       fontWeight: FontWeight.w900)),
                             ],
                           ),
@@ -110,51 +110,51 @@ class MatchDetailScreen extends StatelessWidget {
             // Content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Result
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                             colors: [Color(0xFF1A6B3C), Color(0xFF0E4526)]),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.emoji_events_rounded,
+                          Icon(Icons.emoji_events_rounded,
                               color: AppTheme.accent, size: 24),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Text(match.result,
-                                style: const TextStyle(color: Colors.white,
+                                style: TextStyle(color: Colors.white,
                                     fontWeight: FontWeight.w700, fontSize: 16)),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     // Man of the match
                     _buildManOfTheMatch(),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     // Date
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today_rounded,
+                        Icon(Icons.calendar_today_rounded,
                             size: 14, color: AppTheme.textMuted),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Text(match.date,
-                            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                            style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     // Team 1 Stats
                     _buildTeamStats(match.team1Name),
                     // Team 2 Stats
                     _buildTeamStats(match.team2Name),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -167,7 +167,7 @@ class MatchDetailScreen extends StatelessWidget {
 
   Widget _buildManOfTheMatch() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: AppTheme.accentGradient,
         borderRadius: BorderRadius.circular(14),
@@ -182,23 +182,23 @@ class MatchDetailScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.star_rounded, color: Colors.white, size: 22),
+            child: Icon(Icons.star_rounded, color: Colors.white, size: 22),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('MAN OF THE MATCH',
+              Text('MAN OF THE MATCH',
                   style: TextStyle(color: Colors.white70, fontSize: 10,
                       fontWeight: FontWeight.w700, letterSpacing: 1.5)),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(match.manOfTheMatch,
-                  style: const TextStyle(color: Colors.white, fontSize: 20,
+                  style: TextStyle(color: Colors.white, fontSize: 20,
                       fontWeight: FontWeight.w800)),
             ],
           ),
@@ -211,28 +211,28 @@ class MatchDetailScreen extends StatelessWidget {
     final teamBatting = match.battingPerformances.where((b) => b['team']?.toString().trim() == teamName.trim()).toList();
     final teamBowling = match.bowlingPerformances.where((b) => b['team']?.toString().trim() == teamName.trim()).toList();
 
-    if (teamBatting.isEmpty && teamBowling.isEmpty) return const SizedBox.shrink();
+    if (teamBatting.isEmpty && teamBowling.isEmpty) return SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSectionHeader(teamName, Icons.shield_rounded),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         if (teamBatting.isNotEmpty) ...[
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(left: 4, bottom: 8),
             child: Text('Batting', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.w700, fontSize: 13)),
           ),
           _buildBattingTable(teamBatting),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
         ],
         if (teamBowling.isNotEmpty) ...[
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(left: 4, bottom: 8),
             child: Text('Bowling', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.w700, fontSize: 13)),
           ),
           _buildBowlingTable(teamBowling),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
         ],
       ],
     );
@@ -242,16 +242,16 @@ class MatchDetailScreen extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: AppTheme.primary.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: AppTheme.primaryLight, size: 16),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Text(title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
                 color: AppTheme.textPrimary, letterSpacing: 0.5)),
       ],
     );
@@ -268,11 +268,11 @@ class MatchDetailScreen extends StatelessWidget {
         children: [
           // Header row
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: const BoxDecoration(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: AppTheme.border)),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Expanded(flex: 3, child: Text('Batsman',
                     style: TextStyle(color: AppTheme.textMuted, fontSize: 11,
@@ -292,9 +292,9 @@ class MatchDetailScreen extends StatelessWidget {
             final isLast = entry.key == performances.length - 1;
             double sr = b['balls'] > 0 ? (b['runs'] / b['balls']) * 100 : 0.0;
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                border: isLast ? null : const Border(bottom: BorderSide(color: AppTheme.border)),
+                border: isLast ? null : Border(bottom: BorderSide(color: AppTheme.border)),
               ),
               child: Row(
                 children: [
@@ -304,20 +304,20 @@ class MatchDetailScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('${b['name']}',
-                            style: const TextStyle(color: AppTheme.textPrimary,
+                            style: TextStyle(color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.w600, fontSize: 13)),
                         Text('${b['team']}',
-                            style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                            style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                       ],
                     ),
                   ),
                   SizedBox(width: 40, child: Center(child: Text('${b['runs']}',
-                      style: const TextStyle(color: AppTheme.primaryLight,
+                      style: TextStyle(color: AppTheme.primaryLight,
                           fontWeight: FontWeight.w800, fontSize: 14)))),
                   SizedBox(width: 40, child: Center(child: Text('${b['balls']}',
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
+                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
                   SizedBox(width: 50, child: Center(child: Text(sr.toStringAsFixed(1),
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
+                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
                 ],
               ),
             );
@@ -338,11 +338,11 @@ class MatchDetailScreen extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: const BoxDecoration(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: AppTheme.border)),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Expanded(flex: 3, child: Text('Bowler',
                     style: TextStyle(color: AppTheme.textMuted, fontSize: 11,
@@ -360,9 +360,9 @@ class MatchDetailScreen extends StatelessWidget {
             final b = entry.value;
             final isLast = entry.key == performances.length - 1;
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                border: isLast ? null : const Border(bottom: BorderSide(color: AppTheme.border)),
+                border: isLast ? null : Border(bottom: BorderSide(color: AppTheme.border)),
               ),
               child: Row(
                 children: [
@@ -372,20 +372,20 @@ class MatchDetailScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('${b['name']}',
-                            style: const TextStyle(color: AppTheme.textPrimary,
+                            style: TextStyle(color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.w600, fontSize: 13)),
                         Text('${b['team']}',
-                            style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                            style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                       ],
                     ),
                   ),
                   SizedBox(width: 40, child: Center(child: Text('${b['overs']}',
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
+                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
                   SizedBox(width: 40, child: Center(child: Text('${b['wickets']}',
-                      style: const TextStyle(color: AppTheme.red,
+                      style: TextStyle(color: AppTheme.red,
                           fontWeight: FontWeight.w800, fontSize: 14)))),
                   SizedBox(width: 40, child: Center(child: Text('${b['runs']}',
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
+                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)))),
                 ],
               ),
             );

@@ -14,7 +14,7 @@ class CompletedMatchesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(color: AppTheme.surface),
+        decoration: BoxDecoration(color: AppTheme.surface),
         child: Column(
           children: [
             // Header
@@ -23,7 +23,7 @@ class CompletedMatchesScreen extends StatelessWidget {
                 top: MediaQuery.of(context).padding.top + 8,
                 left: 16, right: 16, bottom: 20,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.blueGradient,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
               ),
@@ -32,17 +32,17 @@ class CompletedMatchesScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Get.back(),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded,
+                      child: Icon(Icons.arrow_back_ios_new_rounded,
                           color: Colors.white, size: 16),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Column(
+                  SizedBox(width: 16),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Match History',
@@ -59,7 +59,7 @@ class CompletedMatchesScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.completedMatches.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -79,7 +79,7 @@ class CompletedMatchesScreen extends StatelessWidget {
                 var sortedMatches = controller.completedMatches.reversed.toList();
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: sortedMatches.length,
                   itemBuilder: (context, index) {
                     CompletedMatch match = sortedMatches[index];
@@ -105,7 +105,7 @@ class _MatchCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.to(() => MatchDetailScreen(match: match)),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.circular(18),
@@ -115,21 +115,21 @@ class _MatchCard extends StatelessWidget {
           children: [
             // Date bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: const BoxDecoration(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: AppTheme.border)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today_rounded, size: 12, color: AppTheme.textMuted),
-                  const SizedBox(width: 6),
+                  Icon(Icons.calendar_today_rounded, size: 12, color: AppTheme.textMuted),
+                  SizedBox(width: 6),
                   Text(match.date,
-                      style: const TextStyle(color: AppTheme.textMuted, fontSize: 12,
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 12,
                           fontWeight: FontWeight.w500)),
                   const Spacer(),
-                  const Icon(Icons.sports_cricket_rounded, size: 14, color: AppTheme.primaryLight),
-                  const SizedBox(width: 4),
-                  const Text('CRICKET', style: TextStyle(
+                  Icon(Icons.sports_cricket_rounded, size: 14, color: AppTheme.primaryLight),
+                  SizedBox(width: 4),
+                  Text('CRICKET', style: TextStyle(
                     color: AppTheme.primaryLight, fontSize: 10,
                     fontWeight: FontWeight.w700, letterSpacing: 1,
                   )),
@@ -138,7 +138,7 @@ class _MatchCard extends StatelessWidget {
             ),
             // Teams vs
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Row(
                 children: [
                   Expanded(
@@ -146,23 +146,23 @@ class _MatchCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(match.team1Name,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
                                 color: AppTheme.textPrimary),
                             overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(match.team1Score,
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900,
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900,
                                 color: AppTheme.primaryLight)),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceElevated,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text('VS',
+                    child: Text('VS',
                         style: TextStyle(color: AppTheme.textMuted, fontSize: 12,
                             fontWeight: FontWeight.w800)),
                   ),
@@ -171,13 +171,13 @@ class _MatchCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(match.team2Name,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
                                 color: AppTheme.textPrimary),
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.end),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(match.team2Score,
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900,
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900,
                                 color: AppTheme.blue)),
                       ],
                     ),
@@ -188,22 +188,22 @@ class _MatchCard extends StatelessWidget {
             // Result banner
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                     colors: [Color(0xFF1A6B3C), Color(0xFF0E4526)]),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.emoji_events_rounded, color: AppTheme.accent, size: 16),
-                  const SizedBox(width: 8),
+                  Icon(Icons.emoji_events_rounded, color: AppTheme.accent, size: 16),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(match.result,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700,
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700,
                             fontSize: 13)),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white54, size: 12),
+                  Icon(Icons.arrow_forward_ios_rounded, color: Colors.white54, size: 12),
                 ],
               ),
             ),

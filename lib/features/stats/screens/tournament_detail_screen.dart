@@ -9,8 +9,7 @@ class TournamentDetailScreen extends StatelessWidget {
   final Tournament tournament;
   final AppController controller = Get.find<AppController>();
 
-  TournamentDetailScreen({Key? key, required this.tournament})
-    : super(key: key);
+  TournamentDetailScreen({super.key, required this.tournament});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class TournamentDetailScreen extends StatelessWidget {
                 right: 16,
                 bottom: 0,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.purpleGradient,
               ),
               child: Column(
@@ -37,26 +36,26 @@ class TournamentDetailScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () => Get.back(),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back_ios_new_rounded,
                             color: Colors.white,
                             size: 16,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               tournament.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
@@ -65,7 +64,7 @@ class TournamentDetailScreen extends StatelessWidget {
                             ),
                             Text(
                               '${tournament.teamIds.length} Teams · ${tournament.startDate}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white60,
                                 fontSize: 12,
                               ),
@@ -75,7 +74,7 @@ class TournamentDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   const TabBar(
                     tabs: [
                       Tab(text: '🏆  Standings'),
@@ -144,7 +143,7 @@ class TournamentDetailScreen extends StatelessWidget {
       );
 
       if (sortedIds.isEmpty) {
-        return const Center(
+        return Center(
           child: Text(
             'No standings yet.',
             style: TextStyle(color: AppTheme.textSecondary),
@@ -153,18 +152,18 @@ class TournamentDetailScreen extends StatelessWidget {
       }
 
       return ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         children: [
           // Table header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
-              borderRadius: const BorderRadius.vertical(
+              borderRadius: BorderRadius.vertical(
                 top: Radius.circular(14),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 SizedBox(width: 32),
                 Expanded(
@@ -236,7 +235,7 @@ class TournamentDetailScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppTheme.surfaceCard,
-              borderRadius: const BorderRadius.vertical(
+              borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(14),
               ),
               border: Border.all(color: AppTheme.border),
@@ -257,7 +256,7 @@ class TournamentDetailScreen extends StatelessWidget {
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
@@ -285,7 +284,7 @@ class TournamentDetailScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               teamName,
@@ -304,7 +303,7 @@ class TournamentDetailScreen extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 '${data['p']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppTheme.textSecondary,
                                   fontSize: 13,
                                 ),
@@ -316,7 +315,7 @@ class TournamentDetailScreen extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 '${data['w']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppTheme.primaryLight,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13,
@@ -329,7 +328,7 @@ class TournamentDetailScreen extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 '${data['l']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppTheme.red,
                                   fontSize: 13,
                                 ),
@@ -355,7 +354,7 @@ class TournamentDetailScreen extends StatelessWidget {
                       ),
                     ),
                     if (!isLast)
-                      const Divider(
+                      Divider(
                         color: AppTheme.border,
                         height: 1,
                         indent: 16,
@@ -379,7 +378,7 @@ class TournamentDetailScreen extends StatelessWidget {
           .toList();
 
       if (tMatches.isEmpty) {
-        return const Center(
+        return Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -399,15 +398,15 @@ class TournamentDetailScreen extends StatelessWidget {
       }
 
       return ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         itemCount: tMatches.length,
         itemBuilder: (context, index) {
           var match = tMatches[index];
           return GestureDetector(
             onTap: () => Get.to(() => MatchDetailScreen(match: match)),
             child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
+              margin: EdgeInsets.only(bottom: 10),
+              padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceCard,
                 borderRadius: BorderRadius.circular(14),
@@ -420,25 +419,25 @@ class TournamentDetailScreen extends StatelessWidget {
                     children: [
                       Text(
                         match.date,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.textMuted,
                           fontSize: 11,
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 12,
                         color: AppTheme.textMuted,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: Text(
                           match.team1Name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: AppTheme.textPrimary,
                             fontSize: 14,
@@ -446,7 +445,7 @@ class TournamentDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 2,
                         ),
@@ -454,7 +453,7 @@ class TournamentDetailScreen extends StatelessWidget {
                           color: AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'vs',
                           style: TextStyle(
                             color: AppTheme.textMuted,
@@ -466,7 +465,7 @@ class TournamentDetailScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           match.team2Name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: AppTheme.textPrimary,
                             fontSize: 14,
@@ -476,9 +475,9 @@ class TournamentDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       vertical: 6,
                       horizontal: 12,
                     ),
@@ -488,7 +487,7 @@ class TournamentDetailScreen extends StatelessWidget {
                     ),
                     child: Text(
                       match.result,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppTheme.primaryLight,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

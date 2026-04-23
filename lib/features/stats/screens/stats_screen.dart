@@ -26,7 +26,7 @@ class StatsScreen extends StatelessWidget {
                 right: 16,
                 bottom: 0,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(0)),
               ),
@@ -37,20 +37,20 @@ class StatsScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () => Get.back(),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back_ios_new_rounded,
                             color: Colors.white,
                             size: 16,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      const Column(
+                      SizedBox(width: 16),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -72,7 +72,7 @@ class StatsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   const TabBar(
                     isScrollable: true,
                     tabs: [
@@ -138,8 +138,8 @@ class StatsScreen extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         border: Border(bottom: BorderSide(color: AppTheme.border)),
       ),
@@ -185,7 +185,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 col3,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textMuted,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -198,7 +198,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 col4,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textMuted,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -212,7 +212,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 col5,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textMuted,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -248,8 +248,8 @@ class StatsScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppTheme.border)),
         ),
         child: Row(
@@ -258,18 +258,18 @@ class StatsScreen extends StatelessWidget {
               width: 24,
               child: Text(
                 '${index + 1}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textMuted,
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: Text(
                 p.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                   color: AppTheme.textPrimary,
@@ -283,7 +283,7 @@ class StatsScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   '${p.matchesPlayed}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: 13,
                   ),
@@ -295,7 +295,7 @@ class StatsScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   score,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.primaryLight,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -308,7 +308,7 @@ class StatsScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   sr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: 13,
                   ),
@@ -320,7 +320,7 @@ class StatsScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   avg,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: 13,
                   ),
@@ -413,12 +413,12 @@ class StatsScreen extends StatelessWidget {
 
   Widget _buildTeamTableHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         border: Border(bottom: BorderSide(color: AppTheme.border)),
       ),
-      child: const Row(
+      child: Row(
         children: [
           SizedBox(
             width: 24,
@@ -514,8 +514,8 @@ class StatsScreen extends StatelessWidget {
 
   Widget _buildTeamTableRow(Team t, int index) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppTheme.border)),
       ),
       child: Row(
@@ -524,14 +524,14 @@ class StatsScreen extends StatelessWidget {
             width: 24,
             child: Text(
               '${index + 1}',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.textMuted,
                 fontWeight: FontWeight.w700,
                 fontSize: 13,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: Row(
               children: [
@@ -540,18 +540,18 @@ class StatsScreen extends StatelessWidget {
                   backgroundColor: AppTheme.primary.withOpacity(0.2),
                   child: Text(
                     t.name.isNotEmpty ? t.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppTheme.primaryLight,
                       fontWeight: FontWeight.w800,
                       fontSize: 10,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     t.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: AppTheme.textPrimary,
@@ -568,7 +568,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 '${t.matchesPlayed}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 13,
                 ),
@@ -580,7 +580,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 '${t.wins}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.primaryLight,
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
@@ -593,7 +593,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 '${t.losses}',
-                style: const TextStyle(color: AppTheme.red, fontSize: 13),
+                style: TextStyle(color: AppTheme.red, fontSize: 13),
               ),
             ),
           ),
@@ -602,7 +602,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 '${t.points}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
@@ -615,7 +615,7 @@ class StatsScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 t.netRunRate.toStringAsFixed(2),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 13,
                 ),
@@ -655,15 +655,15 @@ class StatsScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.bar_chart_rounded,
             size: 56,
             color: AppTheme.textMuted,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             message,
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
           ),
         ],
       ),

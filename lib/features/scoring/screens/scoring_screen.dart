@@ -20,8 +20,8 @@ class ScoringScreen extends StatelessWidget {
       isScrollControlled: true,
       builder: (_) {
         return Container(
-          padding: const EdgeInsets.only(top: 8),
-          decoration: const BoxDecoration(
+          padding: EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
             color: AppTheme.surfaceCard,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
@@ -32,18 +32,18 @@ class ScoringScreen extends StatelessWidget {
               Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
                   color: AppTheme.border,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: AppTheme.primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -56,10 +56,10 @@ class ScoringScreen extends StatelessWidget {
                         size: 18,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Text(
                       'Select ${role.capitalizeFirst}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,
@@ -68,23 +68,23 @@ class ScoringScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-              const Divider(color: AppTheme.border, height: 1),
+              SizedBox(height: 12),
+              Divider(color: AppTheme.border, height: 1),
               // Add new player option
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: AppTheme.accent.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.person_add_rounded,
                     color: AppTheme.accent,
                     size: 18,
                   ),
                 ),
-                title: const Text(
+                title: Text(
                   'Add Custom Player',
                   style: TextStyle(
                     color: AppTheme.accent,
@@ -96,7 +96,7 @@ class ScoringScreen extends StatelessWidget {
                   _addNewPlayerDialog(context, role, team);
                 },
               ),
-              const Divider(color: AppTheme.border, height: 1),
+              Divider(color: AppTheme.border, height: 1),
               ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.4,
@@ -104,6 +104,22 @@ class ScoringScreen extends StatelessWidget {
                 child: ListView(
                   shrinkWrap: true,
                   children: team.players
+                      .where((p) {
+                        if (role == 'striker' || role == 'nonStriker') {
+                          if (p.id == controller.striker.value?.id ||
+                              p.id == controller.nonStriker.value?.id) {
+                            return false;
+                          }
+                          if (controller.outPlayersIds.contains(p.id)) {
+                            return false;
+                          }
+                        } else if (role == 'bowler') {
+                          if (p.id == controller.lastOverBowlerId.value) {
+                            return false;
+                          }
+                        }
+                        return true;
+                      })
                       .map(
                         (p) => ListTile(
                           leading: CircleAvatar(
@@ -111,7 +127,7 @@ class ScoringScreen extends StatelessWidget {
                             backgroundColor: AppTheme.primary.withOpacity(0.2),
                             child: Text(
                               p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppTheme.primaryLight,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -119,7 +135,7 @@ class ScoringScreen extends StatelessWidget {
                           ),
                           title: Text(
                             p.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppTheme.textPrimary,
                               fontWeight: FontWeight.w500,
                             ),
@@ -133,7 +149,7 @@ class ScoringScreen extends StatelessWidget {
                       .toList(),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
             ],
           ),
         );
@@ -156,12 +172,12 @@ class ScoringScreen extends StatelessWidget {
           ),
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -184,7 +200,7 @@ class ScoringScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Add & Select'),
+            child: Text('Add & Select'),
           ),
         ],
       ),
@@ -195,10 +211,10 @@ class ScoringScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(color: AppTheme.surface),
+        decoration: BoxDecoration(color: AppTheme.surface),
         child: Obx(() {
           if (controller.matchSettings.value == null) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppTheme.primary),
             );
           }
@@ -214,13 +230,13 @@ class ScoringScreen extends StatelessWidget {
                       _buildBatsmenPanel(context),
                       _buildBowlerPanel(context),
                       _buildThisOver(),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       // ── Match Over or Scoring Buttons ──
                       if (controller.matchResult.value.isNotEmpty)
                         _buildMatchResultBanner()
                       else
                         _buildScoringButtons(context),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -240,7 +256,7 @@ class ScoringScreen extends StatelessWidget {
         right: 16,
         bottom: 16,
       ),
-      decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
+      decoration: BoxDecoration(gradient: AppTheme.primaryGradient),
       child: Obx(
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -251,12 +267,12 @@ class ScoringScreen extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_ios_new,
                       size: 16,
                       color: Colors.white,
@@ -269,7 +285,7 @@ class ScoringScreen extends StatelessWidget {
                     children: [
                       Text(
                         controller.batTeamName.value,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -277,7 +293,7 @@ class ScoringScreen extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const Text(
+                      Text(
                         'BATTING',
                         style: TextStyle(
                           color: AppTheme.accent,
@@ -291,12 +307,12 @@ class ScoringScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.undo_rounded,
                       size: 18,
                       color: Colors.white,
@@ -307,7 +323,7 @@ class ScoringScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Big score
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -318,7 +334,7 @@ class ScoringScreen extends StatelessWidget {
                   children: [
                     Text(
                       '${controller.totalRuns.value}/${controller.wickets.value}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 52,
                         fontWeight: FontWeight.w900,
@@ -326,10 +342,10 @@ class ScoringScreen extends StatelessWidget {
                         height: 1,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       '${controller.currentOvers.value}.${controller.currentBalls.value} / ${controller.matchSettings.value!.totalOvers} OV',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -345,16 +361,16 @@ class ScoringScreen extends StatelessWidget {
                       controller.runRate.toStringAsFixed(2),
                       Colors.white.withOpacity(0.2),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     if (!controller.isFirstInnings.value) ...[
                       _rateChip(
                         'RRR',
                         controller.requiredRunRate.toStringAsFixed(2),
                         AppTheme.accent.withOpacity(0.3),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 5,
                         ),
@@ -367,7 +383,7 @@ class ScoringScreen extends StatelessWidget {
                         ),
                         child: Text(
                           'Need ${controller.runsNeeded} in ${controller.ballsRemaining}b',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -376,17 +392,17 @@ class ScoringScreen extends StatelessWidget {
                       ),
                     ],
                     if (controller.isFirstInnings.value == false)
-                      const SizedBox.shrink()
+                      SizedBox.shrink()
                     else
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                   ],
                 ),
               ],
             ),
             if (!controller.isFirstInnings.value) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
                 ),
@@ -397,15 +413,15 @@ class ScoringScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.flag_rounded,
                       color: AppTheme.accent,
                       size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       'TARGET: ${controller.targetRuns.value}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppTheme.accent,
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -424,7 +440,7 @@ class ScoringScreen extends StatelessWidget {
 
   Widget _rateChip(String label, String value, Color bg) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(8),
@@ -434,7 +450,7 @@ class ScoringScreen extends StatelessWidget {
         children: [
           Text(
             '$label  ',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white70,
               fontSize: 10,
               fontWeight: FontWeight.w600,
@@ -442,7 +458,7 @@ class ScoringScreen extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.w800,
@@ -456,7 +472,7 @@ class ScoringScreen extends StatelessWidget {
   Widget _buildBatsmenPanel(BuildContext context) {
     return Obx(
       () => Container(
-        margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+        margin: EdgeInsets.fromLTRB(12, 12, 12, 0),
         decoration: BoxDecoration(
           color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.circular(16),
@@ -465,23 +481,23 @@ class ScoringScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(5),
+                    padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: AppTheme.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.sports_cricket_rounded,
                       color: AppTheme.primaryLight,
                       size: 14,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     'BATTING',
                     style: TextStyle(
                       color: AppTheme.textMuted,
@@ -494,7 +510,7 @@ class ScoringScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => controller.swapBatsmen(),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 5,
                       ),
@@ -502,7 +518,7 @@ class ScoringScreen extends StatelessWidget {
                         color: AppTheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -526,9 +542,9 @@ class ScoringScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(color: AppTheme.border, height: 16),
+            Divider(color: AppTheme.border, height: 16),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 14),
               child: Row(
                 children: [
                   Expanded(child: _batsmanTile(context, 'striker', true)),
@@ -568,11 +584,11 @@ class ScoringScreen extends StatelessWidget {
                     letterSpacing: 1,
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Icon(Icons.edit_rounded, size: 10, color: AppTheme.textMuted),
               ],
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               player?.name ?? 'Select Player',
               style: TextStyle(
@@ -584,10 +600,10 @@ class ScoringScreen extends StatelessWidget {
               ),
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               '${controller.getPlayerMatchRuns(player)}(${controller.getPlayerMatchBalls(player)}) SR:${controller.getPlayerMatchStrikeRate(player).toStringAsFixed(0)}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppTheme.textSecondary,
               ),
@@ -603,8 +619,8 @@ class ScoringScreen extends StatelessWidget {
       () => GestureDetector(
         onTap: () => _changePlayer(context, 'bowler'),
         child: Container(
-          margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          margin: EdgeInsets.fromLTRB(12, 8, 12, 0),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: AppTheme.surfaceCard,
             borderRadius: BorderRadius.circular(16),
@@ -613,23 +629,23 @@ class ScoringScreen extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppTheme.blue.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.sports_baseball_rounded,
                   color: AppTheme.blue,
                   size: 18,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'BOWLING',
                       style: TextStyle(
                         fontSize: 9,
@@ -638,7 +654,7 @@ class ScoringScreen extends StatelessWidget {
                         letterSpacing: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       controller.bowler.value?.name ?? 'Select Bowler',
                       style: TextStyle(
@@ -654,14 +670,14 @@ class ScoringScreen extends StatelessWidget {
               ),
               Text(
                 '${controller.getPlayerMatchWickets(controller.bowler.value)}-${controller.getPlayerMatchRunsConceded(controller.bowler.value)} (${controller.getPlayerMatchOversBowled(controller.bowler.value)})',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 8),
-              const Icon(
+              SizedBox(width: 8),
+              Icon(
                 Icons.edit_rounded,
                 size: 14,
                 color: AppTheme.textMuted,
@@ -676,8 +692,8 @@ class ScoringScreen extends StatelessWidget {
   Widget _buildThisOver() {
     return Obx(
       () => Container(
-        margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: EdgeInsets.fromLTRB(12, 8, 12, 0),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.circular(14),
@@ -685,7 +701,7 @@ class ScoringScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Text(
+            Text(
               'THIS OVER',
               style: TextStyle(
                 fontSize: 9,
@@ -694,7 +710,7 @@ class ScoringScreen extends StatelessWidget {
                 letterSpacing: 1.5,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Wrap(
                 spacing: 6,
@@ -743,12 +759,12 @@ class ScoringScreen extends StatelessWidget {
 
   Widget _buildScoringButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'SCORING',
             style: TextStyle(
               fontSize: 9,
@@ -757,7 +773,7 @@ class ScoringScreen extends StatelessWidget {
               letterSpacing: 1.5,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           // Runs row: 0, 1, 2, 3
           Row(
             children: [
@@ -769,7 +785,7 @@ class ScoringScreen extends StatelessWidget {
                   bgColor: AppTheme.surfaceCard,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: _scoreBtn(
                   context,
@@ -778,7 +794,7 @@ class ScoringScreen extends StatelessWidget {
                   bgColor: AppTheme.surfaceCard,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: _scoreBtn(
                   context,
@@ -787,7 +803,7 @@ class ScoringScreen extends StatelessWidget {
                   bgColor: AppTheme.surfaceCard,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: _scoreBtn(
                   context,
@@ -798,7 +814,7 @@ class ScoringScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           // Special row: 4, 6, W, WD, NB
           Row(
             children: [
@@ -812,7 +828,7 @@ class ScoringScreen extends StatelessWidget {
                   featured: true,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 flex: 2,
                 child: _scoreBtn(
@@ -823,7 +839,7 @@ class ScoringScreen extends StatelessWidget {
                   featured: true,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 flex: 2,
                 child: _scoreBtn(
@@ -836,7 +852,7 @@ class ScoringScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -848,7 +864,7 @@ class ScoringScreen extends StatelessWidget {
                   smallText: true,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: _scoreBtn(
                   context,
@@ -909,10 +925,10 @@ class ScoringScreen extends StatelessWidget {
 
   Widget _buildMatchResultBanner() {
     return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.all(12),
+      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF1A6B3C), Color(0xFF0A3D22)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -930,37 +946,37 @@ class ScoringScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.emoji_events_rounded,
               size: 48,
               color: AppTheme.accent,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             controller.matchResult.value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           GestureDetector(
             onTap: () => controller.finalizeAndExit(),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               decoration: BoxDecoration(
                 gradient: AppTheme.accentGradient,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.save_rounded, color: Colors.white, size: 20),
@@ -991,7 +1007,7 @@ class ScoringScreen extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return AlertDialog(
-              title: const Row(
+              title: Row(
                 children: [
                   Icon(Icons.sports_cricket_rounded, color: AppTheme.red),
                   SizedBox(width: 10),
@@ -1005,9 +1021,9 @@ class ScoringScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       labelText: 'Dismissal Type',
                     ),
-                    value: selectedType,
+                    initialValue: selectedType,
                     dropdownColor: AppTheme.surfaceElevated,
-                    style: const TextStyle(color: AppTheme.textPrimary),
+                    style: TextStyle(color: AppTheme.textPrimary),
                     items: ['Bowled', 'Caught', 'Run Out', 'LBW', 'Stumped']
                         .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                         .toList(),
@@ -1019,12 +1035,12 @@ class ScoringScreen extends StatelessWidget {
                     },
                   ),
                   if (selectedType == 'Caught') ...[
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: 'Caught By'),
-                      value: catcherId,
+                      initialValue: catcherId,
                       dropdownColor: AppTheme.surfaceElevated,
-                      style: const TextStyle(color: AppTheme.textPrimary),
+                      style: TextStyle(color: AppTheme.textPrimary),
                       items: controller.bowlTeamRef.players
                           .map(
                             (p) => DropdownMenuItem(
@@ -1043,7 +1059,7 @@ class ScoringScreen extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -1063,7 +1079,7 @@ class ScoringScreen extends StatelessWidget {
                       catcherId: catcherId,
                     );
                   },
-                  child: const Text('OUT!'),
+                  child: Text('OUT!'),
                 ),
               ],
             );
@@ -1081,15 +1097,15 @@ class ScoringScreen extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return AlertDialog(
-              title: const Text('No Ball'),
+              title: Text('No Ball'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Runs scored off the bat:',
                     style: TextStyle(color: AppTheme.textSecondary),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -1133,7 +1149,7 @@ class ScoringScreen extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -1144,7 +1160,7 @@ class ScoringScreen extends StatelessWidget {
                       batsmanRuns: runsOffBat,
                     );
                   },
-                  child: const Text('Confirm'),
+                  child: Text('Confirm'),
                 ),
               ],
             );

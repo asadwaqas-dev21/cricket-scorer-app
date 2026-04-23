@@ -15,7 +15,7 @@ class ManageTeamsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(color: AppTheme.surface),
+        decoration: BoxDecoration(color: AppTheme.surface),
         child: Column(
           children: [
             // Header
@@ -24,7 +24,7 @@ class ManageTeamsScreen extends StatelessWidget {
                 top: MediaQuery.of(context).padding.top + 8,
                 left: 16, right: 16, bottom: 20,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
               ),
@@ -33,16 +33,16 @@ class ManageTeamsScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Get.back(),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded,
+                      child: Icon(Icons.arrow_back_ios_new_rounded,
                           color: Colors.white, size: 16),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,12 +58,12 @@ class ManageTeamsScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => _addTeamDialog(context),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.group_add_rounded, color: Colors.white, size: 18),
                           SizedBox(width: 6),
@@ -81,7 +81,7 @@ class ManageTeamsScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.teams.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -98,7 +98,7 @@ class ManageTeamsScreen extends StatelessWidget {
                   );
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: controller.teams.length,
                   itemBuilder: (context, index) {
                     Team t = controller.teams[index];
@@ -115,7 +115,7 @@ class ManageTeamsScreen extends StatelessWidget {
 
   Widget _buildTeamCard(BuildContext context, Team t) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceCard,
         borderRadius: BorderRadius.circular(18),
@@ -124,8 +124,8 @@ class ManageTeamsScreen extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 12),
           leading: Container(
             width: 44, height: 44,
             decoration: BoxDecoration(
@@ -135,48 +135,48 @@ class ManageTeamsScreen extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               t.name.isNotEmpty ? t.name[0].toUpperCase() : '?',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900,
               ),
             ),
           ),
           title: Text(t.name,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16,
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16,
                   color: AppTheme.textPrimary)),
           subtitle: Text('${t.players.length} players',
-              style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+              style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               _iconAction(Icons.edit_rounded, AppTheme.blue,
                       () => _editTeamDialog(context, t)),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               _iconAction(Icons.delete_outline_rounded, AppTheme.red,
                       () => _deleteTeamConfirm(context, t)),
-              const Icon(Icons.expand_more_rounded, color: AppTheme.textMuted),
+              Icon(Icons.expand_more_rounded, color: AppTheme.textMuted),
             ],
           ),
           children: [
-            const Divider(color: AppTheme.border, height: 12),
+            Divider(color: AppTheme.border, height: 12),
             ...t.players.map((p) => Container(
-              margin: const EdgeInsets.only(bottom: 6),
+              margin: EdgeInsets.only(bottom: 6),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                 leading: CircleAvatar(
                   radius: 18,
                   backgroundColor: AppTheme.primary.withOpacity(0.2),
                   child: Text(
                     p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
-                    style: const TextStyle(color: AppTheme.primaryLight,
+                    style: TextStyle(color: AppTheme.primaryLight,
                         fontWeight: FontWeight.w700, fontSize: 13),
                   ),
                 ),
                 title: Text(p.name,
-                    style: const TextStyle(color: AppTheme.textPrimary,
+                    style: TextStyle(color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w600, fontSize: 14)),
                 onTap: () => Get.to(() => PlayerProfileScreen(player: p)),
                 trailing: Row(
@@ -184,7 +184,7 @@ class ManageTeamsScreen extends StatelessWidget {
                   children: [
                     _iconAction(Icons.edit_rounded, AppTheme.blue,
                             () => _editPlayerDialog(context, t, p), size: 18),
-                    const SizedBox(width: 2),
+                    SizedBox(width: 2),
                     _iconAction(Icons.delete_outline_rounded, AppTheme.red,
                             () => _deletePlayerConfirm(context, t, p), size: 18),
                   ],
@@ -195,8 +195,8 @@ class ManageTeamsScreen extends StatelessWidget {
             GestureDetector(
               onTap: () => _addPlayerDialog(context, t),
               child: Container(
-                margin: const EdgeInsets.only(top: 6),
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.only(top: 6),
+                padding: EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   color: AppTheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
@@ -204,7 +204,7 @@ class ManageTeamsScreen extends StatelessWidget {
                       color: AppTheme.primary.withOpacity(0.3),
                       style: BorderStyle.solid),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.add_rounded, color: AppTheme.primaryLight, size: 18),
@@ -227,7 +227,7 @@ class ManageTeamsScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(7),
@@ -242,7 +242,7 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Create New Team'),
+        title: Text('Create New Team'),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(
@@ -251,10 +251,10 @@ class ManageTeamsScreen extends StatelessWidget {
           ),
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
@@ -267,7 +267,7 @@ class ManageTeamsScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Create'),
+            child: Text('Create'),
           ),
         ],
       ),
@@ -279,7 +279,7 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Add Player'),
+        title: Text('Add Player'),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(
@@ -288,10 +288,10 @@ class ManageTeamsScreen extends StatelessWidget {
           ),
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
@@ -303,7 +303,7 @@ class ManageTeamsScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Add'),
+            child: Text('Add'),
           ),
         ],
       ),
@@ -315,16 +315,16 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Edit Team'),
+        title: Text('Edit Team'),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(labelText: 'Team Name'),
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
@@ -333,7 +333,7 @@ class ManageTeamsScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -344,20 +344,20 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete Team'),
+        title: Text('Delete Team'),
         content: RichText(
           text: TextSpan(
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
             children: [
-              const TextSpan(text: 'Are you sure you want to delete '),
+              TextSpan(text: 'Are you sure you want to delete '),
               TextSpan(text: team.name,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700)),
-              const TextSpan(text: '? This cannot be undone.'),
+                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700)),
+              TextSpan(text: '? This cannot be undone.'),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.red),
             onPressed: () {
@@ -365,7 +365,7 @@ class ManageTeamsScreen extends StatelessWidget {
               controller.refreshData();
               Navigator.pop(context);
             },
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -377,16 +377,16 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Edit Player'),
+        title: Text('Edit Player'),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(labelText: 'Player Name'),
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
@@ -395,7 +395,7 @@ class ManageTeamsScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -406,20 +406,20 @@ class ManageTeamsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Remove Player'),
+        title: Text('Remove Player'),
         content: RichText(
           text: TextSpan(
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
             children: [
-              const TextSpan(text: 'Remove '),
+              TextSpan(text: 'Remove '),
               TextSpan(text: player.name,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700)),
+                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700)),
               TextSpan(text: ' from ${team.name}?'),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.red),
             onPressed: () {
@@ -427,7 +427,7 @@ class ManageTeamsScreen extends StatelessWidget {
               controller.refreshData();
               Navigator.pop(context);
             },
-            child: const Text('Remove'),
+            child: Text('Remove'),
           ),
         ],
       ),

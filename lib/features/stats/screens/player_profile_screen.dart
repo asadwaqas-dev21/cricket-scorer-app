@@ -5,7 +5,7 @@ import '../../../core/models/player.dart';
 class PlayerProfileScreen extends StatelessWidget {
   final Player player;
 
-  const PlayerProfileScreen({Key? key, required this.player}) : super(key: key);
+  const PlayerProfileScreen({super.key, required this.player});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class PlayerProfileScreen extends StatelessWidget {
                 top: MediaQuery.of(context).padding.top + 8,
                 left: 20, right: 20, bottom: 28,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
               ),
@@ -31,18 +31,18 @@ class PlayerProfileScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
+                          child: Icon(Icons.arrow_back_ios_new_rounded,
                               color: Colors.white, size: 16),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   // Avatar
                   Container(
                     width: 80, height: 80,
@@ -54,17 +54,17 @@ class PlayerProfileScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       player.name.isNotEmpty ? player.name[0].toUpperCase() : '?',
-                      style: const TextStyle(color: Colors.white, fontSize: 36,
+                      style: TextStyle(color: Colors.white, fontSize: 36,
                           fontWeight: FontWeight.w900),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(player.name,
-                      style: const TextStyle(color: Colors.white, fontSize: 24,
+                      style: TextStyle(color: Colors.white, fontSize: 24,
                           fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       gradient: AppTheme.accentGradient,
                       borderRadius: BorderRadius.circular(20),
@@ -78,11 +78,11 @@ class PlayerProfileScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star_rounded, color: Colors.white, size: 18),
-                        const SizedBox(width: 6),
+                        Icon(Icons.star_rounded, color: Colors.white, size: 18),
+                        SizedBox(width: 6),
                         Text(
                           '${player.mvpPoints} MVP Points',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800,
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800,
                               fontSize: 15),
                         ),
                       ],
@@ -93,7 +93,7 @@ class PlayerProfileScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -102,15 +102,15 @@ class PlayerProfileScreen extends StatelessWidget {
                     children: [
                       Expanded(child: _quickStat('${player.runsScored}', 'Runs',
                           AppTheme.primaryLight, Icons.sports_cricket_rounded)),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(child: _quickStat('${player.wicketsTaken}', 'Wickets',
                           AppTheme.red, Icons.sports_baseball_rounded)),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(child: _quickStat('${player.catches}', 'Catches',
                           AppTheme.accent, Icons.pan_tool_rounded)),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   // Batting stats
                   _buildStatSection(
                     title: 'Batting',
@@ -124,7 +124,7 @@ class PlayerProfileScreen extends StatelessWidget {
                       ('Sixes (6s)', '${player.sixes}'),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   // Bowling & Fielding stats
                   _buildStatSection(
                     title: 'Bowling & Fielding',
@@ -138,7 +138,7 @@ class PlayerProfileScreen extends StatelessWidget {
                       ('Catches', '${player.catches}'),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -150,7 +150,7 @@ class PlayerProfileScreen extends StatelessWidget {
 
   Widget _quickStat(String value, String label, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceCard,
         borderRadius: BorderRadius.circular(14),
@@ -159,11 +159,11 @@ class PlayerProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, size: 18, color: color),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(value,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
           Text(label,
-              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted,
+              style: TextStyle(fontSize: 11, color: AppTheme.textMuted,
                   fontWeight: FontWeight.w600)),
         ],
       ),
@@ -186,25 +186,25 @@ class PlayerProfileScreen extends StatelessWidget {
         children: [
           // section header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            padding: EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: iconColor, size: 16),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Text(title,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary)),
               ],
             ),
           ),
-          const Divider(color: AppTheme.border, height: 1),
+          Divider(color: AppTheme.border, height: 1),
           // stat rows
           ...stats.asMap().entries.map((entry) {
             final isLast = entry.key == stats.length - 1;
@@ -212,19 +212,19 @@ class PlayerProfileScreen extends StatelessWidget {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(stat.$1,
-                          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                          style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
                       Text(stat.$2,
-                          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15,
+                          style: TextStyle(color: AppTheme.textPrimary, fontSize: 15,
                               fontWeight: FontWeight.w700)),
                     ],
                   ),
                 ),
-                if (!isLast) const Divider(color: AppTheme.border, height: 1, indent: 16),
+                if (!isLast) Divider(color: AppTheme.border, height: 1, indent: 16),
               ],
             );
           }),

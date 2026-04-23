@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen>
     final bottom = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.darkGradient),
+        decoration: BoxDecoration(gradient: AppTheme.darkGradient),
         child: FadeTransition(
           opacity: _fadeIn,
           child: CustomScrollView(
@@ -56,14 +56,14 @@ class _HomeScreenState extends State<HomeScreen>
               // ── Hero CTA ──
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
                   child: _buildHeroCTA(),
                 ),
               ),
               // ── Navigation menu ──
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                  padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
                   child: _buildMenuSection(),
                 ),
               ),
@@ -89,12 +89,12 @@ class _HomeScreenState extends State<HomeScreen>
     return Container(
       padding: EdgeInsets.fromLTRB(24, top + 20, 24, 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF1A6B3C), Color(0xFF145230), Color(0xFF0E3E22)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0E4526).withOpacity(0.5),
@@ -114,11 +114,11 @@ class _HomeScreenState extends State<HomeScreen>
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
-            child: const Center(
+            child: Center(
               child: Text('🏏', style: TextStyle(fontSize: 24)),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,17 +139,43 @@ class _HomeScreenState extends State<HomeScreen>
                     color: AppTheme.accent,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 3,
+                    letterSpacing: 2.5,
                   ),
                 ),
               ],
             ),
           ),
+          GestureDetector(
+            onTap: () {
+              if (Get.isDarkMode) {
+                Get.changeThemeMode(ThemeMode.light);
+              } else {
+                Get.changeThemeMode(ThemeMode.dark);
+              }
+              // Force rebuild for custom static theme colors
+              Future.delayed(const Duration(milliseconds: 100), () {
+                Get.forceAppUpdate();
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Get.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
           // Mini badge — total matches
           Obx(() {
             final count = controller.completedMatches.length;
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -157,15 +183,15 @@ class _HomeScreenState extends State<HomeScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.scoreboard_outlined,
                     size: 14,
                     color: Colors.white54,
                   ),
-                  const SizedBox(width: 5),
+                  SizedBox(width: 5),
                   Text(
                     '$count',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -190,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen>
       final teamsCount = controller.teams.length;
 
       return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: Row(
           children: [
             _StatChip(
@@ -198,13 +224,13 @@ class _HomeScreenState extends State<HomeScreen>
               value: '$teamsCount',
               color: AppTheme.blue,
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             _StatChip(
               label: 'Top Run Scorer',
               value: orange != null ? '${orange.runsScored}' : '–',
               color: const Color(0xFFE8A838),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             _StatChip(
               label: 'Top Wicket Taker',
               value: purple != null ? '${purple.wicketsTaken}' : '–',
@@ -227,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen>
         onTap: () => Get.to(() => MatchSetupScreen()),
         child: Ink(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               colors: [Color(0xFF1A6B3C), Color(0xFF21854D)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -243,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+            padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
             child: Row(
               children: [
                 // Play icon
@@ -254,13 +280,13 @@ class _HomeScreenState extends State<HomeScreen>
                     color: Colors.white.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.play_arrow_rounded,
                     color: Colors.white,
                     size: 26,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: Colors.white38,
                   size: 16,
@@ -306,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'EXPLORE',
           style: TextStyle(
             color: AppTheme.textMuted,
@@ -315,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen>
             letterSpacing: 1.8,
           ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         // 2×2 grid
         Row(
           children: [
@@ -327,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onTap: () => Get.to(() => CompletedMatchesScreen()),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: _MenuTile(
                 title: 'Tour-\nnaments',
@@ -338,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -349,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onTap: () => Get.to(() => StatsScreen()),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: _MenuTile(
                 title: 'Teams &\nPlayers',
@@ -371,13 +397,13 @@ class _HomeScreenState extends State<HomeScreen>
     return Obx(() {
       if (controller.completedMatches.isEmpty) {
         return Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: AppTheme.surfaceCard,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppTheme.border),
           ),
-          child: const Column(
+          child: Column(
             children: [
               Icon(
                 Icons.sports_cricket_rounded,
@@ -404,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'LAST MATCH',
             style: TextStyle(
               color: AppTheme.textMuted,
@@ -413,9 +439,9 @@ class _HomeScreenState extends State<HomeScreen>
               letterSpacing: 1.8,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: AppTheme.surfaceCard,
               borderRadius: BorderRadius.circular(18),
@@ -430,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen>
                     Expanded(
                       child: Text(
                         lastMatch.team1Name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -438,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 3,
                       ),
@@ -446,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen>
                         color: AppTheme.surfaceElevated,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
+                      child: Text(
                         'vs',
                         style: TextStyle(
                           color: AppTheme.textMuted,
@@ -458,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen>
                     Expanded(
                       child: Text(
                         lastMatch.team2Name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -468,11 +494,11 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 // Result
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     vertical: 8,
                     horizontal: 12,
                   ),
@@ -482,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   child: Text(
                     lastMatch.result,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppTheme.primaryLight,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
@@ -490,11 +516,11 @@ class _HomeScreenState extends State<HomeScreen>
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 // Date
                 Text(
                   lastMatch.date,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textMuted,
                     fontSize: 11,
                   ),
@@ -527,7 +553,7 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
           color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.circular(14),
@@ -544,10 +570,10 @@ class _StatChip extends StatelessWidget {
                 height: 1,
               ),
             ),
-            const SizedBox(height: 5),
+            SizedBox(height: 5),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.textMuted,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
@@ -584,7 +610,7 @@ class _MenuTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: onTap,
         child: Ink(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: AppTheme.surfaceCard,
             borderRadius: BorderRadius.circular(18),
@@ -602,10 +628,10 @@ class _MenuTile extends StatelessWidget {
                 ),
                 child: Icon(icon, color: accent, size: 20),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,

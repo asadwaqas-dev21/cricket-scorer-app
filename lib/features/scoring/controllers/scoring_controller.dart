@@ -27,6 +27,9 @@ class ScoringController extends GetxController {
   var nonStriker = Rxn<Player>();
   var bowler = Rxn<Player>();
 
+  var outPlayersIds = <String>[].obs;
+  var lastOverBowlerId = Rxn<String>();
+
   var isFirstInnings = true.obs;
   var targetRuns = 0.obs;
   var matchResult = "".obs;
@@ -65,10 +68,12 @@ class ScoringController extends GetxController {
           .toList(),
     );
 
-    if (playingTeam1.players.isEmpty)
+    if (playingTeam1.players.isEmpty) {
       playingTeam1.players.addAll(team1.players);
-    if (playingTeam2.players.isEmpty)
+    }
+    if (playingTeam2.players.isEmpty) {
       playingTeam2.players.addAll(team2.players);
+    }
 
     batTeamRef =
         (settings.tossWinnerId == team1.id && settings.optTo == 'Bat') ||
@@ -111,9 +116,9 @@ class ScoringController extends GetxController {
   }
 
   void changePlayer(String role, Player p) {
-    if (role == 'striker')
+    if (role == 'striker') {
       striker.value = p;
-    else if (role == 'nonStriker')
+    } else if (role == 'nonStriker')
       nonStriker.value = p;
     else if (role == 'bowler')
       bowler.value = p;
@@ -226,21 +231,21 @@ class ScoringController extends GetxController {
 
     Get.bottomSheet(
       Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SafeArea(
           child: ListView(
             shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.symmetric(vertical: 8),
             children: [
               // Handle bar
               Center(
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
                     color: AppTheme.textMuted,
                     borderRadius: BorderRadius.circular(2),
@@ -248,27 +253,27 @@ class ScoringController extends GetxController {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   'Select Next ${role.capitalizeFirst}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.textPrimary,
                   ),
                 ),
               ),
-              const Divider(color: AppTheme.border),
+              Divider(color: AppTheme.border),
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.person_add_rounded, color: AppTheme.primaryLight, size: 20),
+                  child: Icon(Icons.person_add_rounded, color: AppTheme.primaryLight, size: 20),
                 ),
-                title: const Text(
+                title: Text(
                   'Add New Custom Player',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
@@ -280,15 +285,24 @@ class ScoringController extends GetxController {
                   _addNewPlayerDialog(role, team);
                 },
               ),
-              const Divider(color: AppTheme.border),
+              Divider(color: AppTheme.border),
               ...team.players
+                  .where((p) {
+                    if (role == 'striker' || role == 'nonStriker') {
+                      if (p.id == striker.value?.id || p.id == nonStriker.value?.id) return false;
+                      if (outPlayersIds.contains(p.id)) return false;
+                    } else if (role == 'bowler') {
+                      if (p.id == lastOverBowlerId.value) return false;
+                    }
+                    return true;
+                  })
                   .map(
                     (p) => ListTile(
                       leading: CircleAvatar(
                         backgroundColor: AppTheme.surfaceElevated,
                         child: Text(
                           p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
@@ -296,7 +310,7 @@ class ScoringController extends GetxController {
                       ),
                       title: Text(
                         p.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w500,
                         ),
@@ -307,7 +321,7 @@ class ScoringController extends GetxController {
                       },
                     ),
                   )
-                  .toList(),
+                  ,
             ],
           ),
         ),
@@ -333,7 +347,7 @@ class ScoringController extends GetxController {
           textCapitalization: TextCapitalization.words,
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
@@ -361,7 +375,7 @@ class ScoringController extends GetxController {
                 Get.back();
               }
             },
-            child: const Text('Add & Select'),
+            child: Text('Add & Select'),
           ),
         ],
       ),
@@ -411,6 +425,9 @@ class ScoringController extends GetxController {
     List<String> simHistory = [];
 
     int currentInnings = 1;
+    String? currentBowler;
+    String? finishedOverBowler;
+    List<String> currentOuts = [];
 
     for (var e in allEvents) {
       if (e.innings != currentInnings) {
@@ -420,7 +437,11 @@ class ScoringController extends GetxController {
          simRuns = 0;
          simWickets = 0;
          simHistory.clear();
+         finishedOverBowler = null;
+         currentOuts.clear();
       }
+
+      currentBowler = e.bowlerId;
 
       var mainCtrl = Get.find<AppController>();
       Player pStriker = mainCtrl.getAllPlayers().firstWhere(
@@ -459,6 +480,7 @@ class ScoringController extends GetxController {
 
       if (e.isWicket) {
         simWickets++;
+        currentOuts.add(e.strikerId);
         if (e.wicketType != 'Run Out') {
           pBowler.wicketsTaken++;
         }
@@ -478,6 +500,7 @@ class ScoringController extends GetxController {
         simOvers++;
         pBowler.oversBowled++;
         simHistory.clear();
+        finishedOverBowler = currentBowler;
       }
 
       pStriker.updateMVPPoints();
@@ -490,12 +513,17 @@ class ScoringController extends GetxController {
        simRuns = 0;
        simWickets = 0;
        simHistory.clear();
+       finishedOverBowler = null;
+       currentOuts.clear();
     }
 
     currentOvers.value = simOvers;
     currentBalls.value = simBalls;
     totalRuns.value = simRuns;
     wickets.value = simWickets;
+    
+    outPlayersIds.assignAll(currentOuts);
+    lastOverBowlerId.value = finishedOverBowler;
     
     historyRuns.clear();
     historyRuns.addAll(simHistory);
