@@ -7,6 +7,10 @@ import 'package:cricket_score/features/setup/screens/manage_teams_screen.dart';
 import 'package:cricket_score/features/stats/screens/stats_screen.dart';
 import 'package:cricket_score/features/stats/screens/completed_matches_screen.dart';
 import 'package:cricket_score/features/stats/screens/manage_tournaments_screen.dart';
+import 'package:cricket_score/features/scoring/screens/scoring_screen.dart';
+import 'package:cricket_score/features/scoring/controllers/scoring_controller.dart';
+import 'package:cricket_score/core/models/match_settings.dart';
+import 'package:cricket_score/core/models/ball_event.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -114,9 +118,7 @@ class _HomeScreenState extends State<HomeScreen>
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
-            child: Center(
-              child: Text('🏏', style: TextStyle(fontSize: 24)),
-            ),
+            child: Center(child: Text('🏏', style: TextStyle(fontSize: 24))),
           ),
           SizedBox(width: 14),
           const Expanded(
@@ -164,7 +166,9 @@ class _HomeScreenState extends State<HomeScreen>
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                Get.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                Get.isDarkMode
+                    ? Icons.light_mode_rounded
+                    : Icons.dark_mode_rounded,
                 color: Colors.white,
                 size: 22,
               ),
@@ -246,81 +250,170 @@ class _HomeScreenState extends State<HomeScreen>
   //  HERO CTA — START NEW MATCH
   // ─────────────────────────────────────────────────────────────────────────────
   Widget _buildHeroCTA() {
+    final ongoing = controller.getOngoingMatch();
+    final bool hasOngoing = ongoing != null;
+
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () => Get.to(() => MatchSetupScreen()),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1A6B3C), Color(0xFF21854D)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
+      child: Column(
+        children: [
+          InkWell(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.primaryLight.withOpacity(0.25)),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primary.withOpacity(0.35),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-            child: Row(
-              children: [
-                // Play icon
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 26,
-                  ),
-                ),
-                SizedBox(width: 16),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Start New Match',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          height: 1.2,
-                        ),
+            onTap: () {
+              if (hasOngoing) {
+                final settings = MatchSettings.fromJson(ongoing['settings']);
+                final List<BallEvent> events = (ongoing['events'] as List)
+                    .map((e) => BallEvent.fromJson(e))
+                    .toList();
+
+                Get.delete<ScoringController>();
+                final scoringCtrl = Get.put(ScoringController());
+                scoringCtrl.resumeMatch(settings, events, ongoing);
+                Get.to(() => ScoringScreen());
+              } else {
+                Get.delete<ScoringController>();
+                Get.to(() => const MatchSetupScreen());
+              }
+            },
+            child: Ink(
+              decoration: BoxDecoration(
+                gradient: hasOngoing
+                    ? LinearGradient(
+                        colors: [Color(0xFFE8A838), Color(0xFFC68B25)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      )
+                    : LinearGradient(
+                        colors: [Color(0xFF1A6B3C), Color(0xFF21854D)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      SizedBox(height: 3),
-                      Text(
-                        'Set up teams, overs & toss',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 13,
-                          height: 1.3,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppTheme.primaryLight.withOpacity(0.25),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (hasOngoing ? AppTheme.accent : AppTheme.primary)
+                        .withOpacity(0.35),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        hasOngoing
+                            ? Icons.history_rounded
+                            : Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hasOngoing ? 'Resume Match' : 'Start New Match',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                            ),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            hasOngoing
+                                ? 'Continue your paused match'
+                                : 'Set up teams, overs & toss',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 13,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Colors.white38,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (hasOngoing) ...[
+            SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                Get.dialog(
+                  AlertDialog(
+                    title: Text('Start New Match?'),
+                    content: Text(
+                      'This will delete the current ongoing match progress.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          controller.clearOngoingMatch();
+                          Get.back();
+                          Get.to(() => const MatchSetupScreen());
+                        },
+                        child: Text(
+                          'Start New',
+                          style: TextStyle(color: AppTheme.red),
                         ),
                       ),
                     ],
                   ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.white10),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Colors.white38,
-                  size: 16,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, color: Colors.white70, size: 16),
+                    SizedBox(width: 4),
+                    Text(
+                      'Start New Match Instead',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          ],
+        ],
       ),
     );
   }
@@ -464,10 +557,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceElevated,
                         borderRadius: BorderRadius.circular(6),
@@ -498,10 +588,7 @@ class _HomeScreenState extends State<HomeScreen>
                 // Result
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 12,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
@@ -520,10 +607,7 @@ class _HomeScreenState extends State<HomeScreen>
                 // Date
                 Text(
                   lastMatch.date,
-                  style: TextStyle(
-                    color: AppTheme.textMuted,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
                 ),
               ],
             ),

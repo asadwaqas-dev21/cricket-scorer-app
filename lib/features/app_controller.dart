@@ -5,6 +5,8 @@ import '../core/models/team.dart';
 import '../core/models/player.dart';
 import '../core/models/completed_match.dart';
 import '../core/models/tournament.dart';
+import '../core/models/match_settings.dart';
+import '../core/models/ball_event.dart';
 
 class AppController extends GetxController {
   var teams = <Team>[].obs;
@@ -12,6 +14,47 @@ class AppController extends GetxController {
   var tournaments = <Tournament>[].obs;
 
   Box get _box => Hive.box('cricket_data');
+
+  void saveOngoingMatch({
+    required MatchSettings settings,
+    required List<BallEvent> events,
+    required String strikerId,
+    required String nonStrikerId,
+    required String bowlerId,
+    required bool isFirstInnings,
+    required int targetRuns,
+    required Team team1,
+    required Team team2,
+    required Map<String, dynamic> baselineStats,
+  }) {
+    Map<String, dynamic> data = {
+      'settings': settings.toJson(),
+      'events': events.map((e) => e.toJson()).toList(),
+      'strikerId': strikerId,
+      'nonStrikerId': nonStrikerId,
+      'bowlerId': bowlerId,
+      'isFirstInnings': isFirstInnings,
+      'targetRuns': targetRuns,
+      'team1': team1.toJson(),
+      'team2': team2.toJson(),
+      'baselineStats': baselineStats,
+    };
+    _box.put('ongoing_match', jsonEncode(data));
+  }
+
+  void clearOngoingMatch() {
+    _box.delete('ongoing_match');
+  }
+
+  Map<String, dynamic>? getOngoingMatch() {
+    String? data = _box.get('ongoing_match');
+    if (data == null) return null;
+    try {
+      return jsonDecode(data);
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   void onInit() {

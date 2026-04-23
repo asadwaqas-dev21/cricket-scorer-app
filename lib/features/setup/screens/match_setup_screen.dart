@@ -83,6 +83,7 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
       bowlerOvers = (finalOvers / 5).ceil();
     }
 
+    Get.delete<ScoringController>();
     var scoringController = Get.put(ScoringController());
     scoringController.setupMatch(
       MatchSettings(

@@ -10,6 +10,34 @@ import '../../home/screens/home_screen.dart';
 import '../../../core/theme/app_theme.dart';
 
 class ScoringController extends GetxController {
+  @override
+  void onInit() {
+    super.onInit();
+    // Save state whenever events change
+    ever(allEvents, (_) => _saveOngoingState());
+  }
+
+  void _saveOngoingState() {
+    if (matchSettings.value != null && matchResult.value.isEmpty) {
+      if (striker.value != null &&
+          nonStriker.value != null &&
+          bowler.value != null) {
+        Get.find<AppController>().saveOngoingMatch(
+          settings: matchSettings.value!,
+          events: allEvents,
+          strikerId: striker.value!.id,
+          nonStrikerId: nonStriker.value!.id,
+          bowlerId: bowler.value!.id,
+          isFirstInnings: isFirstInnings.value,
+          targetRuns: targetRuns.value,
+          team1: team1Ref,
+          team2: team2Ref,
+          baselineStats: baselineStats,
+        );
+      }
+    }
+  }
+
   var matchSettings = Rxn<MatchSettings>();
 
   var currentOvers = 0.obs;
@@ -44,23 +72,32 @@ class ScoringController extends GetxController {
 
   var selectedWagonDirection = "".obs;
 
+  // Over-by-over scoring for graphs (T10/T20)
+  var innings1OverRuns = <int>[].obs;
+  var innings2OverRuns = <int>[].obs;
+
+  // Milestone tracking
+  var lastMilestone = Rxn<Map<String, dynamic>>();
+
+  bool get isShortFormat {
+    final overs = matchSettings.value?.totalOvers ?? 0;
+    return overs == 10 || overs == 20;
+  }
+
   void setupMatch(MatchSettings settings) {
     matchSettings.value = settings;
     var mainCtrl = Get.find<AppController>();
     Team team1 = mainCtrl.teams.firstWhere((t) => t.id == settings.team1Id);
     Team team2 = mainCtrl.teams.firstWhere((t) => t.id == settings.team2Id);
 
-    team1Ref = team1;
-    team2Ref = team2;
-
-    Team playingTeam1 = Team(
+    team1Ref = Team(
       id: team1.id,
       name: team1.name,
       players: team1.players
           .where((p) => settings.playingSquad1.contains(p.id))
           .toList(),
     );
-    Team playingTeam2 = Team(
+    team2Ref = Team(
       id: team2.id,
       name: team2.name,
       players: team2.players
@@ -68,24 +105,82 @@ class ScoringController extends GetxController {
           .toList(),
     );
 
-    if (playingTeam1.players.isEmpty) {
-      playingTeam1.players.addAll(team1.players);
-    }
-    if (playingTeam2.players.isEmpty) {
-      playingTeam2.players.addAll(team2.players);
-    }
+    if (team1Ref.players.isEmpty) team1Ref.players.addAll(team1.players);
+    if (team2Ref.players.isEmpty) team2Ref.players.addAll(team2.players);
 
     batTeamRef =
-        (settings.tossWinnerId == team1.id && settings.optTo == 'Bat') ||
-            (settings.tossWinnerId != team1.id && settings.optTo != 'Bat')
-        ? playingTeam1
-        : playingTeam2;
-    bowlTeamRef = batTeamRef == playingTeam1 ? playingTeam2 : playingTeam1;
+        (settings.tossWinnerId == team1Ref.id && settings.optTo == 'Bat') ||
+            (settings.tossWinnerId != team1Ref.id && settings.optTo != 'Bat')
+        ? team1Ref
+        : team2Ref;
+    bowlTeamRef = batTeamRef == team1Ref ? team2Ref : team1Ref;
 
-    // We can show player selection UI instead of default
     allEvents.clear();
     _startInnings(batTeamRef, bowlTeamRef);
-    _saveBaseline([...team1.players, ...team2.players]);
+    _saveBaseline([...team1Ref.players, ...team2Ref.players]);
+  }
+
+  void resumeMatch(
+    MatchSettings settings,
+    List<BallEvent> events,
+    Map<String, dynamic> ongoingData,
+  ) {
+    matchSettings.value = settings;
+    var mainCtrl = Get.find<AppController>();
+    Team team1 = mainCtrl.teams.firstWhere((t) => t.id == settings.team1Id);
+    Team team2 = mainCtrl.teams.firstWhere((t) => t.id == settings.team2Id);
+
+    // Restore teams from saved data if available to keep custom players
+    team1Ref = ongoingData['team1'] != null
+        ? Team.fromJson(ongoingData['team1'])
+        : team1;
+    team2Ref = ongoingData['team2'] != null
+        ? Team.fromJson(ongoingData['team2'])
+        : team2;
+
+    // Use these refs for batting/bowling state
+    batTeamRef =
+        (settings.tossWinnerId == team1Ref.id && settings.optTo == 'Bat') ||
+            (settings.tossWinnerId != team1Ref.id && settings.optTo != 'Bat')
+        ? team1Ref
+        : team2Ref;
+    bowlTeamRef = batTeamRef == team1Ref ? team2Ref : team1Ref;
+
+    // Restore baseline stats
+    if (ongoingData['baselineStats'] != null) {
+      baselineStats = Map<String, Map<String, dynamic>>.from(
+        (ongoingData['baselineStats'] as Map).map(
+          (k, v) => MapEntry(k as String, Map<String, dynamic>.from(v as Map)),
+        ),
+      );
+    } else {
+      _saveBaseline([...team1Ref.players, ...team2Ref.players]);
+    }
+    allEvents.assignAll(events);
+
+    batTeamName.value = batTeamRef.name;
+    bowlTeamName.value = bowlTeamRef.name;
+
+    // Restore current players and state
+    striker.value = batTeamRef.players.firstWhereOrNull(
+      (p) => p.id == (ongoingData['strikerId'] ?? ""),
+    );
+    nonStriker.value = batTeamRef.players.firstWhereOrNull(
+      (p) => p.id == (ongoingData['nonStrikerId'] ?? ""),
+    );
+    bowler.value = bowlTeamRef.players.firstWhereOrNull(
+      (p) => p.id == (ongoingData['bowlerId'] ?? ""),
+    );
+
+    // Fallback if not found
+    striker.value ??= batTeamRef.players[0];
+    nonStriker.value ??= batTeamRef.players[1];
+    bowler.value ??= bowlTeamRef.players[0];
+
+    isFirstInnings.value = ongoingData['isFirstInnings'] ?? true;
+    targetRuns.value = ongoingData['targetRuns'] ?? 0;
+
+    _rebuildFromEvents();
   }
 
   void _startInnings(Team batTeam, Team bowlTeam) {
@@ -118,10 +213,12 @@ class ScoringController extends GetxController {
   void changePlayer(String role, Player p) {
     if (role == 'striker') {
       striker.value = p;
-    } else if (role == 'nonStriker')
+    } else if (role == 'nonStriker') {
       nonStriker.value = p;
-    else if (role == 'bowler')
+    } else if (role == 'bowler') {
       bowler.value = p;
+    }
+    _saveOngoingState();
   }
 
   void _saveBaseline(List<Player> players) {
@@ -164,6 +261,7 @@ class ScoringController extends GetxController {
     String extraType = "",
     String wicketType = "",
     String? catcherId,
+    String? outPlayerId,
     int batsmanRuns = 0,
   }) {
     if (matchSettings.value == null) return;
@@ -179,7 +277,8 @@ class ScoringController extends GetxController {
 
     var pBowler = bowler.value;
     if (pBowler != null &&
-        getPlayerMatchOversBowled(pBowler) >= matchSettings.value!.maxOversPerBowler &&
+        getPlayerMatchOversBowled(pBowler) >=
+            matchSettings.value!.maxOversPerBowler &&
         extraType == "") {
       Get.snackbar(
         'Limit Reached',
@@ -198,6 +297,7 @@ class ScoringController extends GetxController {
         wagonDirection: selectedWagonDirection.value,
         wicketType: wicketType,
         catcherId: catcherId,
+        outPlayerId: outPlayerId,
         batsmanRuns: batsmanRuns,
         innings: isFirstInnings.value ? 1 : 2,
       ),
@@ -205,9 +305,26 @@ class ScoringController extends GetxController {
 
     selectedWagonDirection.value = "";
 
+    // Track runs before rebuild for milestone detection
+    int runsBefore = getPlayerMatchRuns(striker.value);
+
     if (runs % 2 != 0 && extraType == "") swapBatsmen();
 
     _rebuildFromEvents();
+
+    // Milestone detection (only for T10/T20)
+    if (isShortFormat && !isWicket) {
+      // After swap, the player who scored may now be nonStriker
+      Player? scoringPlayer = (runs % 2 != 0 && extraType == "")
+          ? nonStriker.value
+          : striker.value;
+      int runsAfter = getPlayerMatchRuns(scoringPlayer);
+      if (runsBefore < 50 && runsAfter >= 50) {
+        _triggerMilestone(scoringPlayer!, 50);
+      } else if (runsBefore < 100 && runsAfter >= 100) {
+        _triggerMilestone(scoringPlayer!, 100);
+      }
+    }
 
     if (currentBalls.value == 0 &&
         currentOvers.value > 0 &&
@@ -273,7 +390,11 @@ class ScoringController extends GetxController {
                     color: AppTheme.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.person_add_rounded, color: AppTheme.primaryLight, size: 20),
+                  child: Icon(
+                    Icons.person_add_rounded,
+                    color: AppTheme.primaryLight,
+                    size: 20,
+                  ),
                 ),
                 title: Text(
                   'Add New Custom Player',
@@ -291,7 +412,9 @@ class ScoringController extends GetxController {
               ...team.players
                   .where((p) {
                     if (role == 'striker' || role == 'nonStriker') {
-                      if (p.id == striker.value?.id || p.id == nonStriker.value?.id) return false;
+                      if (p.id == striker.value?.id ||
+                          p.id == nonStriker.value?.id)
+                        return false;
                       if (outPlayersIds.contains(p.id)) return false;
                     } else if (role == 'bowler') {
                       if (p.id == lastOverBowlerId.value) return false;
@@ -322,8 +445,7 @@ class ScoringController extends GetxController {
                         Get.back();
                       },
                     ),
-                  )
-                  ,
+                  ),
             ],
           ),
         ),
@@ -432,26 +554,39 @@ class ScoringController extends GetxController {
     String? finishedOverBowler;
     List<String> currentOuts = [];
 
+    // Over-by-over tracking for graphs
+    List<int> i1Overs = [];
+    List<int> i2Overs = [];
+    int overRunAccum = 0;
+
     for (var e in allEvents) {
       if (e.innings != currentInnings) {
-         currentInnings = e.innings;
-         simOvers = 0;
-         simBalls = 0;
-         simRuns = 0;
-         simWickets = 0;
-         simHistory.clear();
-         finishedOverBowler = null;
-         currentOuts.clear();
+        // Save partial over before switching innings
+        if (overRunAccum > 0 || simBalls > 0) {
+          i1Overs.add(overRunAccum);
+        }
+        currentInnings = e.innings;
+        simOvers = 0;
+        simBalls = 0;
+        simRuns = 0;
+        simWickets = 0;
+        simHistory.clear();
+        finishedOverBowler = null;
+        currentOuts.clear();
+        overRunAccum = 0;
       }
 
       currentBowler = e.bowlerId;
 
-      var mainCtrl = Get.find<AppController>();
-      Player pStriker = mainCtrl.getAllPlayers().firstWhere(
+      // Support custom players by searching in the match's active team references
+      List<Player> localPlayers = [...team1Ref.players, ...team2Ref.players];
+      Player pStriker = localPlayers.firstWhere(
         (p) => p.id == e.strikerId,
+        orElse: () => Player(id: e.strikerId, name: 'Unknown'),
       );
-      Player pBowler = mainCtrl.getAllPlayers().firstWhere(
+      Player pBowler = localPlayers.firstWhere(
         (p) => p.id == e.bowlerId,
+        orElse: () => Player(id: e.bowlerId, name: 'Unknown'),
       );
 
       if (e.extraType == "") {
@@ -480,15 +615,16 @@ class ScoringController extends GetxController {
       }
 
       pBowler.runsConceded += e.runs;
+      overRunAccum += e.runs;
 
       if (e.isWicket) {
         simWickets++;
-        currentOuts.add(e.strikerId);
+        currentOuts.add(e.outPlayerId ?? e.strikerId);
         if (e.wicketType != 'Run Out') {
           pBowler.wicketsTaken++;
         }
         if (e.catcherId != null) {
-          Player? pCatcher = mainCtrl.getAllPlayers().firstWhereOrNull(
+          Player? pCatcher = localPlayers.firstWhereOrNull(
             (p) => p.id == e.catcherId,
           );
           if (pCatcher != null) {
@@ -504,6 +640,13 @@ class ScoringController extends GetxController {
         pBowler.oversBowled++;
         simHistory.clear();
         finishedOverBowler = currentBowler;
+        // Record completed over runs
+        if (currentInnings == 1) {
+          i1Overs.add(overRunAccum);
+        } else {
+          i2Overs.add(overRunAccum);
+        }
+        overRunAccum = 0;
       }
 
       pStriker.updateMVPPoints();
@@ -511,23 +654,23 @@ class ScoringController extends GetxController {
     }
 
     if (!isFirstInnings.value && currentInnings == 1) {
-       simOvers = 0;
-       simBalls = 0;
-       simRuns = 0;
-       simWickets = 0;
-       simHistory.clear();
-       finishedOverBowler = null;
-       currentOuts.clear();
+      simOvers = 0;
+      simBalls = 0;
+      simRuns = 0;
+      simWickets = 0;
+      simHistory.clear();
+      finishedOverBowler = null;
+      currentOuts.clear();
     }
 
     currentOvers.value = simOvers;
     currentBalls.value = simBalls;
     totalRuns.value = simRuns;
     wickets.value = simWickets;
-    
+
     outPlayersIds.assignAll(currentOuts);
     lastOverBowlerId.value = finishedOverBowler;
-    
+
     historyRuns.clear();
     historyRuns.addAll(simHistory);
 
@@ -550,7 +693,31 @@ class ScoringController extends GetxController {
     nonStriker.refresh();
     bowler.refresh();
 
+    // Update over-by-over graph data
+    innings1OverRuns.assignAll(i1Overs);
+    innings2OverRuns.assignAll(i2Overs);
+
     Get.find<AppController>().saveData();
+  }
+
+  void _triggerMilestone(Player player, int milestone) {
+    int runs = getPlayerMatchRuns(player);
+    int balls = getPlayerMatchBalls(player);
+    int fours =
+        (player.fours) - ((baselineStats[player.id]?['fours'] as int?) ?? 0);
+    int sixes =
+        (player.sixes) - ((baselineStats[player.id]?['sixes'] as int?) ?? 0);
+    double sr = balls > 0 ? (runs / balls) * 100 : 0.0;
+
+    lastMilestone.value = {
+      'name': player.name,
+      'milestone': milestone,
+      'runs': runs,
+      'balls': balls,
+      'fours': fours,
+      'sixes': sixes,
+      'strikeRate': sr,
+    };
   }
 
   void swapBatsmen() {
@@ -564,7 +731,9 @@ class ScoringController extends GetxController {
       : 0.0;
 
   int get runsNeeded => targetRuns.value - totalRuns.value;
-  int get ballsRemaining => (matchSettings.value!.totalOvers * 6) - (currentOvers.value * 6 + currentBalls.value);
+  int get ballsRemaining =>
+      (matchSettings.value!.totalOvers * 6) -
+      (currentOvers.value * 6 + currentBalls.value);
 
   double get requiredRunRate {
     if (isFirstInnings.value) return 0.0;
@@ -606,61 +775,96 @@ class ScoringController extends GetxController {
 
   void finalizeAndExit() {
     var mainCtrl = Get.find<AppController>();
-    
+
     int t1Wins = 0, t1Losses = 0, t1Points = 0;
     int t2Wins = 0, t2Losses = 0, t2Points = 0;
 
     // Distribute team Win/Loss
-    if (matchResult.value.contains(team1Ref.name) && !matchResult.value.contains('Tied')) {
-      t1Wins = 1; t2Losses = 1; t1Points = 2;
-    } else if (matchResult.value.contains(team2Ref.name) && !matchResult.value.contains('Tied')) {
-      t2Wins = 1; t1Losses = 1; t2Points = 2;
+    if (matchResult.value.contains(team1Ref.name) &&
+        !matchResult.value.contains('Tied')) {
+      t1Wins = 1;
+      t2Losses = 1;
+      t1Points = 2;
+    } else if (matchResult.value.contains(team2Ref.name) &&
+        !matchResult.value.contains('Tied')) {
+      t2Wins = 1;
+      t1Losses = 1;
+      t2Points = 2;
     } else {
-      t1Points = 1; t2Points = 1;
+      t1Points = 1;
+      t2Points = 1;
     }
 
-    int t1RunsScored = 0, t1OversFaced = 0, t1RunsConceded = 0, t1OversBowled = 0;
-    int t2RunsScored = 0, t2OversFaced = 0, t2RunsConceded = 0, t2OversBowled = 0;
+    int t1RunsScored = 0,
+        t1OversFaced = 0,
+        t1RunsConceded = 0,
+        t1OversBowled = 0;
+    int t2RunsScored = 0,
+        t2OversFaced = 0,
+        t2RunsConceded = 0,
+        t2OversBowled = 0;
 
     if (batTeamRef.id == team1Ref.id) {
-       t1RunsScored = totalRuns.value;
-       t1OversFaced = currentOvers.value;
-       t2RunsConceded = totalRuns.value;
-       t2OversBowled = currentOvers.value;
-       
-       t2RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       t2OversFaced = matchSettings.value!.totalOvers; 
-       t1RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       t1OversBowled = matchSettings.value!.totalOvers;
-    } else {
-       t2RunsScored = totalRuns.value;
-       t2OversFaced = currentOvers.value;
-       t1RunsConceded = totalRuns.value;
-       t1OversBowled = currentOvers.value;
+      t1RunsScored = totalRuns.value;
+      t1OversFaced = currentOvers.value;
+      t2RunsConceded = totalRuns.value;
+      t2OversBowled = currentOvers.value;
 
-       t1RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       t1OversFaced = matchSettings.value!.totalOvers; 
-       t2RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       t2OversBowled = matchSettings.value!.totalOvers;
+      t2RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+      t2OversFaced = matchSettings.value!.totalOvers;
+      t1RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+      t1OversBowled = matchSettings.value!.totalOvers;
+    } else {
+      t2RunsScored = totalRuns.value;
+      t2OversFaced = currentOvers.value;
+      t1RunsConceded = totalRuns.value;
+      t1OversBowled = currentOvers.value;
+
+      t1RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+      t1OversFaced = matchSettings.value!.totalOvers;
+      t2RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+      t2OversBowled = matchSettings.value!.totalOvers;
     }
 
     // Apply the deltas
-    team1Ref.wins += t1Wins; team1Ref.losses += t1Losses; team1Ref.points += t1Points; team1Ref.matchesPlayed++;
-    team2Ref.wins += t2Wins; team2Ref.losses += t2Losses; team2Ref.points += t2Points; team2Ref.matchesPlayed++;
+    team1Ref.wins += t1Wins;
+    team1Ref.losses += t1Losses;
+    team1Ref.points += t1Points;
+    team1Ref.matchesPlayed++;
+    team2Ref.wins += t2Wins;
+    team2Ref.losses += t2Losses;
+    team2Ref.points += t2Points;
+    team2Ref.matchesPlayed++;
 
-    team1Ref.totalRunsScored += t1RunsScored; team1Ref.totalOversFaced += t1OversFaced;
-    team1Ref.totalRunsConceded += t1RunsConceded; team1Ref.totalOversBowled += t1OversBowled;
+    team1Ref.totalRunsScored += t1RunsScored;
+    team1Ref.totalOversFaced += t1OversFaced;
+    team1Ref.totalRunsConceded += t1RunsConceded;
+    team1Ref.totalOversBowled += t1OversBowled;
 
-    team2Ref.totalRunsScored += t2RunsScored; team2Ref.totalOversFaced += t2OversFaced;
-    team2Ref.totalRunsConceded += t2RunsConceded; team2Ref.totalOversBowled += t2OversBowled;
+    team2Ref.totalRunsScored += t2RunsScored;
+    team2Ref.totalOversFaced += t2OversFaced;
+    team2Ref.totalRunsConceded += t2RunsConceded;
+    team2Ref.totalOversBowled += t2OversBowled;
 
     Map<String, dynamic> team1Deltas = {
-      'wins': t1Wins, 'losses': t1Losses, 'points': t1Points, 'matchesPlayed': 1,
-      'runsScored': t1RunsScored, 'oversFaced': t1OversFaced, 'runsConceded': t1RunsConceded, 'oversBowled': t1OversBowled,
+      'wins': t1Wins,
+      'losses': t1Losses,
+      'points': t1Points,
+      'matchesPlayed': 1,
+      'runsScored': t1RunsScored,
+      'oversFaced': t1OversFaced,
+      'runsConceded': t1RunsConceded,
+      'oversBowled': t1OversBowled,
     };
     Map<String, dynamic> team2Deltas = {
-      'wins': t2Wins, 'losses': t2Losses, 'points': t2Points, 'matchesPlayed': 1,
-      'runsScored': t2RunsScored, 'oversFaced': t2OversFaced, 'runsConceded': t2RunsConceded, 'oversBowled': t2OversBowled,
+      'wins': t2Wins,
+      'losses': t2Losses,
+      'points': t2Points,
+      'matchesPlayed': 1,
+      'runsScored': t2RunsScored,
+      'oversFaced': t2OversFaced,
+      'runsConceded': t2RunsConceded,
+      'oversBowled': t2OversBowled,
     };
 
     // Calculate Detailed Stats and Man of the Match
@@ -673,13 +877,13 @@ class ScoringController extends GetxController {
     List<Player> allMatchPlayers = [...team1Ref.players, ...team2Ref.players];
     for (var p in allMatchPlayers) {
       p.matchesPlayed++;
-      
+
       int r = getPlayerMatchRuns(p);
       int b = getPlayerMatchBalls(p);
       int w = getPlayerMatchWickets(p);
       int rc = getPlayerMatchRunsConceded(p);
       int o = getPlayerMatchOversBowled(p);
-      
+
       int f = (p.fours) - ((baselineStats[p.id]?['fours'] as int?) ?? 0);
       int sx = (p.sixes) - ((baselineStats[p.id]?['sixes'] as int?) ?? 0);
       int c = (p.catches) - ((baselineStats[p.id]?['catches'] as int?) ?? 0);
@@ -694,7 +898,7 @@ class ScoringController extends GetxController {
         'sixes': sx,
         'catches': c,
       };
-      
+
       // Local match MVP calculation
       int matchMVP = r + (w * 20); // Simple version for MOTM
 
@@ -723,8 +927,12 @@ class ScoringController extends GetxController {
     }
 
     // Build History Match
-    String i1S = firstInningsScore.value.isEmpty ? '${totalRuns.value}/${wickets.value}' : firstInningsScore.value; 
-    String i2S = firstInningsScore.value.isEmpty ? 'DNB' : '${totalRuns.value}/${wickets.value}';
+    String i1S = firstInningsScore.value.isEmpty
+        ? '${totalRuns.value}/${wickets.value}'
+        : firstInningsScore.value;
+    String i2S = firstInningsScore.value.isEmpty
+        ? 'DNB'
+        : '${totalRuns.value}/${wickets.value}';
 
     CompletedMatch cMatch = CompletedMatch(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -747,6 +955,7 @@ class ScoringController extends GetxController {
 
     mainCtrl.completedMatches.add(cMatch);
     mainCtrl.saveData();
+    mainCtrl.clearOngoingMatch();
 
     Get.offAll(() => const HomeScreen());
   }
