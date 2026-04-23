@@ -101,7 +101,6 @@ class AppController extends GetxController {
   }
 
   void syncStats() {
-    // 1. Reset all stats
     for (var team in teams) {
       team.wins = 0;
       team.losses = 0;
