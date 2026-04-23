@@ -135,6 +135,7 @@ class ScoringController extends GetxController {
         'runsConceded': p.runsConceded,
         'fours': p.fours,
         'sixes': p.sixes,
+        'catches': p.catches,
       };
     }
   }
@@ -151,6 +152,7 @@ class ScoringController extends GetxController {
         p.runsConceded = baselineStats[p.id]!['runsConceded'];
         p.fours = baselineStats[p.id]!['fours'] ?? 0;
         p.sixes = baselineStats[p.id]!['sixes'] ?? 0;
+        p.catches = baselineStats[p.id]!['catches'] ?? 0;
         p.updateMVPPoints();
       }
     }
@@ -370,6 +372,7 @@ class ScoringController extends GetxController {
                   'runsConceded': 0,
                   'fours': 0,
                   'sixes': 0,
+                  'catches': 0,
                 };
                 changePlayer(role, newPlayer);
                 Get.back();
@@ -604,49 +607,66 @@ class ScoringController extends GetxController {
   void finalizeAndExit() {
     var mainCtrl = Get.find<AppController>();
     
+    int t1Wins = 0, t1Losses = 0, t1Points = 0;
+    int t2Wins = 0, t2Losses = 0, t2Points = 0;
+
     // Distribute team Win/Loss
     if (matchResult.value.contains(team1Ref.name) && !matchResult.value.contains('Tied')) {
-      team1Ref.wins++;
-      team2Ref.losses++;
-      team1Ref.points += 2;
+      t1Wins = 1; t2Losses = 1; t1Points = 2;
     } else if (matchResult.value.contains(team2Ref.name) && !matchResult.value.contains('Tied')) {
-      team2Ref.wins++;
-      team1Ref.losses++;
-      team2Ref.points += 2;
+      t2Wins = 1; t1Losses = 1; t2Points = 2;
     } else {
-      team1Ref.points += 1;
-      team2Ref.points += 1;
+      t1Points = 1; t2Points = 1;
     }
-    team1Ref.matchesPlayed++;
-    team2Ref.matchesPlayed++;
 
-    // Tally up team total aggregate (simplistic approach based on direct additions)
+    int t1RunsScored = 0, t1OversFaced = 0, t1RunsConceded = 0, t1OversBowled = 0;
+    int t2RunsScored = 0, t2OversFaced = 0, t2RunsConceded = 0, t2OversBowled = 0;
+
     if (batTeamRef.id == team1Ref.id) {
-       team1Ref.totalRunsScored += totalRuns.value;
-       team1Ref.totalOversFaced += currentOvers.value;
-       team2Ref.totalRunsConceded += totalRuns.value;
-       team2Ref.totalOversBowled += currentOvers.value;
+       t1RunsScored = totalRuns.value;
+       t1OversFaced = currentOvers.value;
+       t2RunsConceded = totalRuns.value;
+       t2OversBowled = currentOvers.value;
        
-       team2Ref.totalRunsScored += targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       team2Ref.totalOversFaced += matchSettings.value!.totalOvers; // fallback approximation 
-       team1Ref.totalRunsConceded += targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       team1Ref.totalOversBowled += matchSettings.value!.totalOvers;
+       t2RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+       t2OversFaced = matchSettings.value!.totalOvers; 
+       t1RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+       t1OversBowled = matchSettings.value!.totalOvers;
     } else {
-       // Reverse logic for team2 batting second
-       team2Ref.totalRunsScored += totalRuns.value;
-       team2Ref.totalOversFaced += currentOvers.value;
-       team1Ref.totalRunsConceded += totalRuns.value;
-       team1Ref.totalOversBowled += currentOvers.value;
+       t2RunsScored = totalRuns.value;
+       t2OversFaced = currentOvers.value;
+       t1RunsConceded = totalRuns.value;
+       t1OversBowled = currentOvers.value;
 
-       team1Ref.totalRunsScored += targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       team1Ref.totalOversFaced += matchSettings.value!.totalOvers; 
-       team2Ref.totalRunsConceded += targetRuns.value > 0 ? targetRuns.value - 1 : 0;
-       team2Ref.totalOversBowled += matchSettings.value!.totalOvers;
+       t1RunsScored = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+       t1OversFaced = matchSettings.value!.totalOvers; 
+       t2RunsConceded = targetRuns.value > 0 ? targetRuns.value - 1 : 0;
+       t2OversBowled = matchSettings.value!.totalOvers;
     }
+
+    // Apply the deltas
+    team1Ref.wins += t1Wins; team1Ref.losses += t1Losses; team1Ref.points += t1Points; team1Ref.matchesPlayed++;
+    team2Ref.wins += t2Wins; team2Ref.losses += t2Losses; team2Ref.points += t2Points; team2Ref.matchesPlayed++;
+
+    team1Ref.totalRunsScored += t1RunsScored; team1Ref.totalOversFaced += t1OversFaced;
+    team1Ref.totalRunsConceded += t1RunsConceded; team1Ref.totalOversBowled += t1OversBowled;
+
+    team2Ref.totalRunsScored += t2RunsScored; team2Ref.totalOversFaced += t2OversFaced;
+    team2Ref.totalRunsConceded += t2RunsConceded; team2Ref.totalOversBowled += t2OversBowled;
+
+    Map<String, dynamic> team1Deltas = {
+      'wins': t1Wins, 'losses': t1Losses, 'points': t1Points, 'matchesPlayed': 1,
+      'runsScored': t1RunsScored, 'oversFaced': t1OversFaced, 'runsConceded': t1RunsConceded, 'oversBowled': t1OversBowled,
+    };
+    Map<String, dynamic> team2Deltas = {
+      'wins': t2Wins, 'losses': t2Losses, 'points': t2Points, 'matchesPlayed': 1,
+      'runsScored': t2RunsScored, 'oversFaced': t2OversFaced, 'runsConceded': t2RunsConceded, 'oversBowled': t2OversBowled,
+    };
 
     // Calculate Detailed Stats and Man of the Match
     List<Map<String, dynamic>> battingStats = [];
     List<Map<String, dynamic>> bowlingStats = [];
+    Map<String, dynamic> playerDeltas = {};
     Player? motm;
     int maxMatchMVP = -100;
 
@@ -659,6 +679,21 @@ class ScoringController extends GetxController {
       int w = getPlayerMatchWickets(p);
       int rc = getPlayerMatchRunsConceded(p);
       int o = getPlayerMatchOversBowled(p);
+      
+      int f = (p.fours) - ((baselineStats[p.id]?['fours'] as int?) ?? 0);
+      int sx = (p.sixes) - ((baselineStats[p.id]?['sixes'] as int?) ?? 0);
+      int c = (p.catches) - ((baselineStats[p.id]?['catches'] as int?) ?? 0);
+
+      playerDeltas[p.id] = {
+        'runsScored': r,
+        'ballsFaced': b,
+        'wicketsTaken': w,
+        'runsConceded': rc,
+        'oversBowled': o,
+        'fours': f,
+        'sixes': sx,
+        'catches': c,
+      };
       
       // Local match MVP calculation
       int matchMVP = r + (w * 20); // Simple version for MOTM
@@ -695,6 +730,8 @@ class ScoringController extends GetxController {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       team1Name: team1Ref.name,
       team2Name: team2Ref.name,
+      team1Id: team1Ref.id,
+      team2Id: team2Ref.id,
       date: DateTime.now().toString().substring(0, 10),
       result: matchResult.value,
       tournamentId: matchSettings.value!.tournamentId,
@@ -703,6 +740,9 @@ class ScoringController extends GetxController {
       manOfTheMatch: motm?.name ?? "N/A",
       battingPerformances: battingStats,
       bowlingPerformances: bowlingStats,
+      playerDeltas: playerDeltas,
+      team1Deltas: team1Deltas,
+      team2Deltas: team2Deltas,
     );
 
     mainCtrl.completedMatches.add(cMatch);

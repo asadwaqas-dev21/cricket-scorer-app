@@ -127,12 +127,21 @@ class _MatchCard extends StatelessWidget {
                       style: TextStyle(color: AppTheme.textMuted, fontSize: 12,
                           fontWeight: FontWeight.w500)),
                   const Spacer(),
-                  Icon(Icons.sports_cricket_rounded, size: 14, color: AppTheme.primaryLight),
-                  SizedBox(width: 4),
-                  Text('CRICKET', style: TextStyle(
-                    color: AppTheme.primaryLight, fontSize: 10,
-                    fontWeight: FontWeight.w700, letterSpacing: 1,
-                  )),
+                  GestureDetector(
+                    onTap: () {
+                      _showDeleteConfirmation(context, match);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline_rounded, size: 16, color: AppTheme.red),
+                        SizedBox(width: 4),
+                        Text('DELETE', style: TextStyle(
+                          color: AppTheme.red, fontSize: 10,
+                          fontWeight: FontWeight.w700, letterSpacing: 1,
+                        )),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -209,6 +218,33 @@ class _MatchCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, CompletedMatch match) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete Match', style: TextStyle(color: AppTheme.textPrimary)),
+        content: Text('Are you sure you want to delete this match? All related stats for players and teams will be reversed.', style: TextStyle(color: AppTheme.textSecondary)),
+        backgroundColor: AppTheme.surfaceElevated,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: TextStyle(color: AppTheme.textMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.red),
+            onPressed: () {
+              Get.find<AppController>().deleteMatch(match.id);
+              Navigator.pop(ctx);
+              Get.snackbar('Deleted', 'Match data has been removed successfully',
+                  backgroundColor: AppTheme.surfaceElevated, colorText: AppTheme.textPrimary);
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }

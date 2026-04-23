@@ -73,9 +73,15 @@ class StatsScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 12),
-                  const TabBar(
+                  TabBar(
                     isScrollable: true,
-                    tabs: [
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white.withOpacity(0.6),
+                    indicatorColor: AppTheme.accent,
+                    indicatorWeight: 3,
+                    labelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                    tabs: const [
                       Tab(text: '⭐  MVP'),
                       Tab(text: '🏏  Batting'),
                       Tab(text: '⚾  Bowling'),
